@@ -32,7 +32,7 @@ def translate_genome_HEX2OUT(genome):
         instructions[connection_number]['source_ID'] = int(instruction[1:8],2)
         instructions[connection_number]['sink_type'] = int(instruction[8],2)
         instructions[connection_number]['sink_ID'] = int(instruction[9:16],2)
-        instructions[connection_number]['weight'] = int(instruction[16:33],2)/int('1111111111111111',2)*4
+        instructions[connection_number]['weight'] = int(instruction[16:33],2)/int('1111111111111111',2)*4*([-1,1][random.randrange(2)])
     return instructions
 
 '''cross over for mating'''

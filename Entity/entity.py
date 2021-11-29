@@ -2,6 +2,7 @@ import random
 import string
 
 from Genetics.genetics import *
+from Model.model import Model
 
 class Entity:
     """
@@ -267,7 +268,7 @@ class Entity:
             self.inner_neurons = None
             self.output_neurons = None
             
-        def __organs(self):
+        def __load_neurons(self):
             """
                 sensory neurons
                 inter neurons
@@ -325,7 +326,6 @@ class Entity:
                 '9':random.random(),
             }
             
-            
             '''output neurons'''
             # Establish motor neurons and their outputs
             self.output_neurons = {
@@ -352,20 +352,55 @@ class Entity:
                 '20': self.Actions.eat_human(),
             }
             
-        def __build_brain_network(self):
-            self.__organs() # loads organs
+        def __build_brain_connections(self):
             instructions = translate_genome_HEX2OUT(genome=self.Entity.genome) # loads instructions for brain
-            ## TODO turn instructions into neural network and take compute as final output rule
-            print(instructions)
+            self.Entity.brain = [[(['input' if (instructions[connection]['source_type'])==1 else 'inner'][0]),
+               (instructions[connection]['source_ID']%[len(self.inner_neurons) if instructions[connection]['source_ID']==0 else len(self.input_neurons)][0]),
+               (['output' if (instructions[connection]['sink_type'])==1 else 'inner'][0]),
+               ((instructions[connection]['source_ID'])%([len(self.inner_neurons) if instructions[connection]['source_ID']==0 else len(self.output_neurons)][0])),
+               (instructions[connection]['weight'])] for connection in instructions]
+            
+        def __prune_connections(self):
+            pruned_brain = []
+            brain_input_section = [connections[0:2] for connections in self.Entity.brain]
+            brain_output_section = [connections[2:4] for connections in self.Entity.brain]
+
+            for connection in self.Entity.brain:
+                # Trims inner connections with no final connection
+                if connection[2] == 'inner': # If hidden layer exists. in --> hidden
+                    if connection[2:4] not in brain_input_section:
+                        continue
+
+                # Trims inner connections with no starter connection, random noise/zero value
+                if connection[0] == 'inner': # If hidden layer exists. hidden --> out
+                    if connection[0:2] not in brain_output_section:
+                        continue
+
+                # Trims loops that have no input and output
+                if (connection[0:2] == connection[2:4]) & (connection[0] == connection[2] == 'inner'):
+                    if ~((connection[0:2] in brain_output_section) & (connection[2:4] in brain_input_section)):
+                        continue
+                    
+                pruned_brain.append(connection)
+            self.Entity.brain = pruned_brain
 
         def think(self): # come to a decision
-            if self.Entity.brain is None:
-                self.__build_brain_network()
-    
+            self.__load_neurons() # loads neuron values
+            
+            if self.Entity.brain is None: # generates brain if one doesn't exist
+                self.__build_brain_connections()
+                self.__prune_connections()
+            
+            choice = Model(connections=self.Entity.brain,
+                           input_neurons=self.input_neurons,
+                           inner_neurons=self.inner_neurons,
+                           output_neurons=self.output_neurons).compile_and_run()
+
     '''NPC Commit Next Step'''
     def next(self, environment):
         if self.Status(Entity=self).update_status()['status'] == 'dead':
             return
+        
         self.Brain(Entity=self,
                    Pathfinding=self.Pathfinding(environment=environment, Entity=self),
                    Actions=self.Actions(environment=environment, Entity=self),
