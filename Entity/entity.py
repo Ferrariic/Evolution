@@ -168,100 +168,88 @@ class Entity:
             self.__check_can_mate()
             self.__check_is_starving()
             self.__bound_stats()
-            return {"status":"alive"}
-
+            return {"status":"alive"}    
+        
     class Actions:
         """
-            Actions that an Entity can do to other Entities
-        """
-        def __init__(self, environment, Entity):
-            self.Entity = Entity
-            self.environment = environment
-        
-        def attack(self):
-            self.Entity.energy -= 2 # Subtracts 1 energy for attacking
-            # TODO
-            return
-        
-        def mate(self):
-            self.Entity.energy -= 2 # Subtracts 1 energy for mating
-            # TODO
-            return
-        
-        def rest(self):
-            self.Entity.energy += 5 # Adds 5 energy for resting
-            # TODO
-            return
-        
-        def share_food(self):
-            # TODO
-            return
-        
-        def bury(self):
-            # TODO
-            return
-        
-        def hunt(self):
-            # TODO
-            return
-        
-        def heal_other(self):
-            # TODO
-            return
-        
-        def pick_plant(self):
-            # TODO
-            return
-        
-        def eat_human(self):
-            # TODO
-            return
-        
-        
-    class Pathfinding:
-        """
-            Movement handling
+            Action handling
         """
         def __init__(self, environment, Entity):
             self.Entity = Entity
             self.environment = environment
             
-        def move(self, direction=None):
+        def do_action(self, option=None):
             self.Entity.energy -= 1 #Subtracts 1 energy for movement
             # TODO check to make sure tile is not occupied, moves tile*velocity
-            if direction == 'UP':
-                return
-            if direction == 'DN':
-                return
-            if direction == 'L':
-                return
-            if direction == 'R':
-                return
-            if direction == 'UPR':
-                return
-            if direction == 'UPL':
-                return
-            if direction == 'DNR':
-                return
-            if direction == 'DNL':
-                return
-            if direction == 'RANDOM':
-                return
-            if direction == 'FORWARD':
-                return
-            if direction == 'REVERSE':
-                return
-            if direction == 'HALT':
-                return
+            if option == 'UP':
+                print("moving up")
+
+            if option == 'DN':
+                print("moving dn")
+
+            if option == 'L':
+                print("moving l")
+
+            if option == 'R':
+                print("moving r")
+
+            if option == 'UPR':
+                print("moving upr")
+
+            if option == 'UPL':
+                print("moving upl")
+
+            if option == 'DNR':
+                print("moving dnr")
+
+            if option == 'DNL':
+                print("moving dnl")
+
+            if option == 'RANDOM':
+                print("moving random")
+
+            if option == 'FORWARD':
+                print("moving fwd")
+
+            if option == 'REVERSE':
+                print("moving reverse")
+
+            if option == 'HALT':
+                print("halted")
+
+            if option == 'ATTACK':
+                print("attacking")
+
+            if option == 'MATE':
+                print("mating")
+
+            if option == 'REST':
+                print("resting")
+
+            if option == 'SHARE_FOOD':
+                print("sharing food")
+
+            if option == 'BURY':
+                print("burying")
+
+            if option == 'HUNT':
+                print("hunting")
+                
+            if option == 'HEAL_OTHER':
+                print("healing other")
             
+            if option == 'PICK_PLANT':
+                print("picking plant")
+                
+            if option == 'EAT_HUMAN':
+                print("eating human")
             
     class Brain:
         """
             Thinks for entity; Maybe add IQ so doors don't start walking around (?)
         """
-        def __init__(self, Entity, Pathfinding, Actions, environment):
+        def __init__(self, Entity, Actions, environment):
             self.Entity = Entity
-            self.Pathfinding = Pathfinding
             self.Actions = Actions
             self.environment = environment
             self.input_neurons = None
@@ -329,27 +317,27 @@ class Entity:
             '''output neurons'''
             # Establish motor neurons and their outputs
             self.output_neurons = {
-                '0': self.Pathfinding.move(direction='UP'),
-                '1': self.Pathfinding.move(direction='DN'),
-                '2': self.Pathfinding.move(direction='L'),
-                '3': self.Pathfinding.move(direction='R'),
-                '4': self.Pathfinding.move(direction='UPR'),
-                '5': self.Pathfinding.move(direction='UPL'),
-                '6': self.Pathfinding.move(direction='DNR'),
-                '7': self.Pathfinding.move(direction='DNL'),
-                '8': self.Pathfinding.move(direction='RANDOM'),
-                '9': self.Pathfinding.move(direction='FORWARD'),
-                '10': self.Pathfinding.move(direction='REVERSE'),
-                '11': self.Pathfinding.move(direction='HALT'),
-                '12': self.Actions.attack(),
-                '13': self.Actions.mate(),
-                '14': self.Actions.rest(),
-                '15': self.Actions.share_food(),
-                '16': self.Actions.bury(),
-                '17': self.Actions.hunt(),
-                '18': self.Actions.heal_other(),
-                '19': self.Actions.pick_plant(),
-                '20': self.Actions.eat_human(),
+                '0': 'UP',
+                '1': 'DN',
+                '2': 'L',
+                '3': 'R',
+                '4': 'UPR',
+                '5': 'UPL',
+                '6': 'DNR',
+                '7': 'DNL',
+                '8': 'RANDOM',
+                '9': 'FORWARD',
+                '10': 'REVERSE',
+                '11': 'HALT',
+                '12': 'ATTACK',
+                '13': 'MATE',
+                '14': 'REST',
+                '15': 'SHARE_FOOD',
+                '16': 'BURY',
+                '17': 'HUNT',
+                '18': 'HEAL_OTHER',
+                '19': 'PICK_PLANT',
+                '20': 'EAT_HUMAN',
             }
             
         def __build_brain_connections(self):
@@ -391,10 +379,14 @@ class Entity:
                 self.__build_brain_connections()
                 self.__prune_connections()
             
-            choice = Model(connections=self.Entity.brain,
+            choice = Model(brain=self.Entity.brain,
                            input_neurons=self.input_neurons,
                            inner_neurons=self.inner_neurons,
                            output_neurons=self.output_neurons).compile_and_run()
+            if choice['brain_status'] == 'ERROR':
+                return
+            
+            self.Actions.do_action(option=self.output_neurons[choice['brain_status']])
 
     '''NPC Commit Next Step'''
     def next(self, environment):
@@ -402,7 +394,6 @@ class Entity:
             return
         
         self.Brain(Entity=self,
-                   Pathfinding=self.Pathfinding(environment=environment, Entity=self),
                    Actions=self.Actions(environment=environment, Entity=self),
                    environment=environment
                    ).think()
