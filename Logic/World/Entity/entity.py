@@ -3,7 +3,7 @@ import string
 
 from Entity.model import Model
 from Entity.genetics import *
-from Entity.Actions import individual, interactions, movement
+from Entity.Actions import individual, interactions, movement, direction
 
 
 class Entity:
@@ -213,6 +213,15 @@ class Entity:
         def do_action(self, option=None):
             if not ((self.Entity.energy > 1) & (self.Entity.is_alive)):
                 return
+            
+            '''direction'''
+            if option == 'DIR_RIGHT':
+                direction.change_direction_RIGHT(self.environment, self.Entity)
+            if option == 'DIR_LEFT':
+                direction.change_direction_LEFT(self.environment, self.Entity)
+            if option == 'DIR_REVERSE':
+                direction.change_direction_REVERSE(self.environment, self.Entity)
+            
             '''movement'''
             if option == 'UP':
                 movement.move_UP(self.environment, self.Entity)
@@ -354,6 +363,9 @@ class Entity:
                 '18': 'HEAL_OTHER',
                 '19': 'PICK_PLANT',
                 '20': 'EAT_HUMAN',
+                '21': 'DIR_RIGHT',
+                '22': 'DIR_LEFT',
+                '23': 'DIR_REVERSE',
             }
             
         def __build_brain_connections(self):

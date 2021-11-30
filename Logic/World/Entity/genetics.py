@@ -23,7 +23,7 @@ def translate_genome_HEX2OUT(genome):
     # 1-8 - source ID [unsigned % number of neurons to tell which neuron]
     # 9 - sink type [0 - internal neuron, 1 - output neuron]
     # 10-16 - sink ID [unsigned % number of neurons to tell which neuron]
-    # 17-32 - weight (divide to get actual) 
+    # 17-32 - weight (divide to get actual)
     RNA = decode_genome_HEX2BIN(genome)
     instructions = dict()
     for connection_number, instruction in enumerate(RNA):
