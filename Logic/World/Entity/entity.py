@@ -1,11 +1,11 @@
-from os import environ
 import random
 import string
+from os import environ
 
+from Entity.Actions import direction, individual, interactions, movement
+from Entity.genetics import *
 from Entity.model import Model
 from Entity.status import Status
-from Entity.genetics import *
-from Entity.Actions import individual, interactions, movement, direction
 
 
 class Entity:
@@ -27,44 +27,47 @@ class Entity:
         """
             Entity properties
         """
-        # Name of entity
+        
+        '''random name given'''
         self.name = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 12))
-        self.entity_type = 'human'
-        self.position = [random.randint(-10,10),random.randint(-10,10)]
-        self.velocity = random.randint(1,30)
-        self.direction = random.randint(0,359)
-        self.is_alive = True
-        self.is_Male = random.choice([True, False])
-        self.will_Flee = random.choice([True, False])
+        
+        '''genetic assignments'''
         self.genome = generate_genome_RAND2HEX(length_genome=self.genome_length)
-        self.generation = 0
-        self.age = 0
-        self.size = 5
-        self.strength = random.randint(30,50)
-        self.health = random.randint(75,125)
-        self.children = 0
-        self.color = [random.randint(0,255), random.randint(0,255), random.randint(0,255)]
-        self.food = random.randint(80,100)
-        self.is_starving = False
-        self.liked = 0
-        self.goal = None
-        self.job_tasks = 0
-        self.energy = 100
+        self.velocity = assign_velocity_HEX2INT(self.genome)
+        self.is_Male = assign_male_HEX2BOOL(self.genome)
+        self.will_Flee = assign_flee_HEX2BOOL(self.genome)
+        self.color = assign_color_HEX2TRIPLE255(self.genome)
+        self.size = assign_size_HEX2INT7(self.genome)
+        self.strength = assign_strength_HEX2INT63(self.genome)
+        self.health = assign_health_HEX2INT127(self.genome)
+        
+        '''world properties'''
+        self.position = [random.randint(-10,10),random.randint(-10,10)]
+        self.direction = random.randint(0,359)
+        
+        '''self properties'''
         self.inventory = []
+        self.food = 100
+        self.energy = 100
+        self.liked = 0
+        self.children = 0
+        self.generation = 0
+        self.age = 0    
+        self.is_starving = False
         self.can_mate = False
+        self.is_alive = True
         self.brain = None
         self.cause_of_death = None
         
         if self.properties is not None:
             self.name = self.properties['name']
-            self.entity_type = self.properties['entity_type']
+            self.genome = self.properties['genome']
             self.position = self.properties['position']
             self.velocity = self.properties['velocity']
             self.direction = self.properties['direction']
             self.is_alive = self.properties['is_Alive']
             self.is_Male = self.properties['is_Male']
             self.will_Flee = self.properties['will_Flee']
-            self.genome = self.properties['genome']
             self.generation =  self.properties['generation']
             self.age = self.properties['age']
             self.size = self.properties['size']
@@ -75,8 +78,6 @@ class Entity:
             self.food = self.properties['food']
             self.is_starving = self.properties['is_starving']
             self.liked = self.properties['liked']
-            self.goal = self.properties['goal']
-            self.job_tasks = self.properties['job_tasks']
             self.energy = self.properties['energy']
             self.inventory = self.properties['inventory']
             self.can_mate = self.properties['can_mate']
@@ -86,7 +87,6 @@ class Entity:
     def export_entity_values(self):
         properties = {
             'name':self.name,
-            'entity_type':self.entity_type,
             'position':self.position,
             'velocity':self.velocity,
             'direction':self.direction,
@@ -104,8 +104,6 @@ class Entity:
             'food':self.food,
             'is_starving':self.is_starving,
             'liked':self.liked,
-            'goal':self.goal,
-            'job_tasks':self.job_tasks,
             'energy':self.energy,
             'inventory':self.inventory,
             'can_mate':self.can_mate,
@@ -223,13 +221,12 @@ class Entity:
             '7' : (self.Entity.food)/100, # food available
             '8' : (self.Entity.liked)/100, # are they liked or not
             '9' : (self.Entity.energy)/100, # how much energy do they have
-            '10' : (self.Entity.job_tasks)/100, # how many times have they done their job
-            '11' : [1 if self.Entity.is_starving else -1][0], # are they starving
-            '12' : [1 if self.Entity.can_mate else -1][0], # are they able to mate
+            '10' : [1 if self.Entity.is_starving else -1][0], # are they starving
+            '11' : [1 if self.Entity.can_mate else -1][0], # are they able to mate
             
             # random neurons and sensory mutations
-            '13' : random.random(), # random values
-            '14' : random.getrandbits(1), # random bits
+            '12' : random.random(), # random values
+            '13' : random.getrandbits(1), # random bits
             
             # external identifiers
             ## Blockage x, y

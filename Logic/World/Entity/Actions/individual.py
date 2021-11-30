@@ -7,6 +7,5 @@ def update_environment(environment, entity):
 
 def individual_REST(environment, entity):
     entity.energy += 50
-    entity.health += 1
-    entity.food += 5
+    entity.food += 3
     update_environment(environment, entity)

@@ -48,7 +48,6 @@ def interact_ATTACK(environment, entity):
     if interaction_target['health'] < 0:
         interaction_target['cause_of_death'] = 'Attacked, and died.'
         entity.food += interaction_target['food'] # takes their food
-        print(f"{interaction_target['name']} died fighting {entity.name}")
     
     # Update environment
     update_environment(environment, entity, interaction_target)
@@ -59,7 +58,7 @@ def interact_MATE(environment, entity):
         return
     if not (interaction_target['is_Alive'] & (interaction_target['can_mate'] & entity.can_mate) & (entity.is_Male != interaction_target['is_Male'])):
         return
-    if not ((entity.energy > 10)&(interaction_target['energy']>10)):
+    if not ((entity.energy > 10) & (interaction_target['energy']>10)):
         return
     
     entity.energy -= 10
@@ -69,37 +68,9 @@ def interact_MATE(environment, entity):
     interaction_target['children'] += 1
     
     '''builds child'''
-    new_entity = dict()
-    new_entity['name'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 12))
-    new_entity['food'] = random.randint(80,100)
-    new_entity['children'] = 0
-    new_entity['strength'] = random.randint(30,50)
-    new_entity['health'] = random.randint(75,125)
-    new_entity['direction'] = random.randint(0,359)
-    new_entity['is_Alive'] = True
-    new_entity['is_Male'] = random.choice([True, False])
-    new_entity['can_mate'] = False
-    new_entity['energy'] = 100
-    new_entity['age'] = 0
-    new_entity['brain'] = None
-    new_entity['is_starving'] = False
-    new_entity['job_tasks'] = 0
-    new_entity['liked'] = 0
-    new_entity['goal'] = None
-    new_entity['inventory'] = []
-    new_entity['entity_type'] = 'human'
-    new_entity['genome'] =  cross_over_HEX_A_HEX(entity.genome, interaction_target['genome'])
-    new_entity['position'] = random.choice([entity.position, interaction_target['position']])
-    new_entity['velocity'] = random.choice([entity.velocity, interaction_target['velocity']])
-    new_entity['will_Flee'] = random.choice([entity.will_Flee, interaction_target['will_Flee']])
-    new_entity['generation'] = int(max([entity.generation,interaction_target['generation']])+1)
-    new_entity['size'] = random.choice([entity.size, interaction_target['size']])
-    new_entity['color'] = [int((entity.color[0]+interaction_target['color'][0])/2), int((entity.color[1]+interaction_target['color'][1])/2), int((entity.color[2]+interaction_target['color'][2])/2)]
-    new_entity['cause_of_death'] = None
-    
+    new_entity = mate_parents_OBJ_DICT(entity=entity, interaction_target=interaction_target)
     update_environment(environment, entity, interaction_target) # Update parents to field
     environment['environment_json'].append(new_entity)
-    print(new_entity['name'], 'child added of parents', entity.name, interaction_target['name'])
     
 def interact_SHARE_FOOD(environment, entity):
     interaction_target = closest_node(environment, entity)
@@ -144,6 +115,9 @@ def interact_HEAL_OTHER(environment, entity):
     if not (entity.energy > 5):
         return
     entity.energy -= 5
+    entity.food -= 2
+    interaction_target['health'] += 20
+    update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
 
 def interact_PICK_PLANT(environment, entity):
     interaction_target = closest_node(environment, entity)

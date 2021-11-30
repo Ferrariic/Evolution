@@ -6,7 +6,6 @@ class Status:
         self.properties = properties
         
         self.name = self.properties['name']
-        self.entity_type = self.properties['entity_type']
         self.position = self.properties['position']
         self.velocity = self.properties['velocity']
         self.direction = self.properties['direction']
@@ -24,8 +23,6 @@ class Status:
         self.food = self.properties['food']
         self.is_starving = self.properties['is_starving']
         self.liked = self.properties['liked']
-        self.goal = self.properties['goal']
-        self.job_tasks = self.properties['job_tasks']
         self.energy = self.properties['energy']
         self.inventory = self.properties['inventory']
         self.can_mate = self.properties['can_mate']
@@ -70,8 +67,8 @@ class Status:
         if self.food < 0:
             self.food = 0
             
-        if self.health > 100:
-            self.health = 100
+        if self.health > 200:
+            self.health = 200
         if self.health < 0:
             self.health = 0
             
@@ -82,18 +79,20 @@ class Status:
             
         ### Optional world bounds
         x, y = self.position[0], self.position[1]
-        if (x>100):
-            self.position[0]=100
-        if (x<-100):
-            self.position[0]=-100
-        if (y>100):
-            self.position[1]=100
-        if (y<-100):
-            self.position[1]=-100
+        world_size = [[-1000,1000],[-1000,1000]]
+        if (x>world_size[0][1]):
+            self.position[0]=world_size[0][1]
+        if (x<world_size[0][0]):
+            self.position[0]=world_size[0][0]
+        if (y>world_size[1][1]):
+            self.position[1]=world_size[1][1]
+        if (y<world_size[1][0]):
+            self.position[1]=world_size[1][0]
             
     def __world_decay(self):
         '''constant decay states for the world'''
-        self.food -= 1 # Subtract 1 food per cycle
+        genome_length = len(self.genome.split(' '))
+        self.food -= (1+0.1*genome_length) # Subtract 1 food per cycle, times a genome length modifier
         self.age += 1 # Add one age per cycle
         
     def __spend_stats(self):
@@ -104,12 +103,12 @@ class Status:
             self.energy += 20
         
         '''If the entity is starving and has 0 food, subtract health'''
-        if self.food < 1:
+        if self.is_starving:
             self.health -= 5
             self.energy -= 5
 
-        '''If the entity is starving and has 0 food, subtract health'''
-        if (self.health < 50) & (self.food > 2) & (self.energy > 5) :
+        '''If the entity is injured, heal'''
+        if ((self.health < 50) & (self.food > 2) & (self.energy > 5)) & ~(self.is_starving):
             self.food -= 2
             self.energy -= 5
             self.health += 5
@@ -117,7 +116,6 @@ class Status:
     def __export_entity_values(self):
         properties = {
             'name':self.name,
-            'entity_type':self.entity_type,
             'position':self.position,
             'velocity':self.velocity,
             'direction':self.direction,
@@ -135,8 +133,6 @@ class Status:
             'food':self.food,
             'is_starving':self.is_starving,
             'liked':self.liked,
-            'goal':self.goal,
-            'job_tasks':self.job_tasks,
             'energy':self.energy,
             'inventory':self.inventory,
             'can_mate':self.can_mate,
