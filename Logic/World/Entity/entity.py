@@ -1,7 +1,9 @@
+from os import environ
 import random
 import string
 
 from Entity.model import Model
+from Entity.status import Status
 from Entity.genetics import *
 from Entity.Actions import individual, interactions, movement, direction
 
@@ -14,7 +16,6 @@ class Entity:
         """
             Inner class declaration
         """
-        self.Status # Updates Entity object status
         self.Brain # Entity Brain
         
         """
@@ -113,94 +114,14 @@ class Entity:
         }
         return properties
     
-    class Status:
-        """
-            Modifies status of Entity
-        """
-        def __init__(self, Entity):
-            self.Entity = Entity
-        
-        def __check_is_alive(self):
-            health_check = (self.Entity.health < 0)
-            if health_check:
-                self.Entity.is_alive = False
-                return False
-            return True
-        
-        def __check_can_mate(self):
-            age_lower_bound_check = (self.Entity.age > 18)
-            age_upper_bound_check = (self.Entity.age < 60)
-            food_check = (self.Entity.food > 0)
-            energy_check = (self.Entity.energy > 0)
-            
-            self.Entity.can_mate = False
-            if age_lower_bound_check & age_upper_bound_check & food_check & energy_check:
-                self.Entity.can_mate = True
-                
-        def __check_is_starving(self):
-            food_check = self.Entity.food > 0
-            self.Entity.is_starving = True
-            if food_check:
-                self.Entity.is_starving = False
-                
-        def __bound_stats(self):
-            if self.Entity.energy > 100:
-                self.Entity.energy = 100
-            if self.Entity.energy < 0:
-                self.Entity.energy = 0
-                
-            if self.Entity.liked > 100:
-                self.Entity.liked = 100
-            if self.Entity.liked < -100:
-                self.Entity.liked = -100
-                
-            if self.Entity.food > 100:
-                self.Entity.food = 100
-            if self.Entity.food < 0:
-                self.Entity.food = 0
-                
-            if self.Entity.health > 100:
-                self.Entity.health = 100
-            if self.Entity.health < 0:
-                self.Entity.health = 0
-                
-            if self.Entity.strength > 100:
-                self.Entity.strength = 100
-            if self.Entity.strength < 0:
-                self.Entity.strength = 0 
-                
-        def __world_decay(self):
-            '''constant decay states for the world'''
-            self.Entity.food -= 1 # Subtract 1 food per cycle
-            self.Entity.age += 1 # Add one age per cycle
-            
-        def __spend_stats(self):
-            
-            '''If the entity is weak, spend food to replenish energy'''
-            if (self.Entity.energy < 10) & (self.Entity.food > 5):
-                self.Entity.food -= 2
-                self.Entity.energy += 20
-            
-            '''If the entity is starving and has 0 food, subtract health'''
-            if self.Entity.food < 1:
-                self.Entity.health -= 5
-                self.Entity.energy -= 5
-
-            '''If the entity is starving and has 0 food, subtract health'''
-            if (self.Entity.health < 50) & (self.Entity.food > 2) & (self.Entity.energy > 5) :
-                self.Entity.food -= 2
-                self.Entity.energy -= 5
-                self.Entity.health += 5
-            
-        def update_status(self):
-            self.__world_decay() # world stats reduced per cycle
-            self.__spend_stats() # stat upkeep
-            if not self.__check_is_alive(): # checks if dead
-                return {"status":"dead"}
-            self.__check_can_mate() # checks if can mate
-            self.__check_is_starving() # checks if starving
-            self.__bound_stats() # bounds stats depending on if out of range
-            return {"status":"alive"}    
+    def update_entity_values(environment):
+        status_list = []
+        for entity in environment['environment_json']:
+            entity_properties = Status(entity).update_status()['status']
+            if entity_properties == 'dead':
+                continue
+            status_list.append(entity_properties)
+        return [Entity(properties=entity) for entity in status_list] # generates new entities
         
     class Actions:
         """
@@ -418,9 +339,6 @@ class Entity:
 
     '''NPC Commit Next Step'''
     def next(self, environment):
-        if self.Status(Entity=self).update_status()['status'] == 'dead':
-            return
-        
         self.Brain(Entity=self,
                    Actions=self.Actions(environment=environment, Entity=self),
                    environment=environment

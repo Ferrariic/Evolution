@@ -11,6 +11,10 @@ def is_occupied(environment, goal):
     if goal in locations:
         return True
     return False
+
+def update_environment(environment, entity):
+    name_position = environment['all_entity_names'].index(entity.name)
+    environment['environment_json'][name_position] = entity.export_entity_values()
     
 '''movement functions'''
 def move_UP(environment, entity):
@@ -20,6 +24,7 @@ def move_UP(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_DN(environment, entity):
     entity.energy -= 1
@@ -28,6 +33,7 @@ def move_DN(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_L(environment, entity):
     entity.energy -= 1
@@ -36,6 +42,7 @@ def move_L(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
 
 def move_R(environment, entity):
     entity.energy -= 1
@@ -44,6 +51,7 @@ def move_R(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
 
 def move_UPR(environment, entity):
     entity.energy -= 1
@@ -52,6 +60,7 @@ def move_UPR(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_UPL(environment, entity):
     entity.energy -= 1
@@ -60,6 +69,7 @@ def move_UPL(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_DNR(environment, entity):
     entity.energy -= 1
@@ -68,6 +78,7 @@ def move_DNR(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_DNL(environment, entity):
     entity.energy -= 1
@@ -76,6 +87,7 @@ def move_DNL(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
 
 def move_RANDOM(environment, entity):
     entity.energy -= 1
@@ -86,6 +98,7 @@ def move_RANDOM(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_FORWARD(environment, entity):
     entity.energy -= 1
@@ -96,6 +109,7 @@ def move_FORWARD(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_REVERSE(environment, entity):
     entity.energy -= 1
@@ -106,6 +120,7 @@ def move_REVERSE(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
     
 def move_HALT(environment, entity):
     x, y = entity.position[0], entity.position[1]
@@ -113,3 +128,4 @@ def move_HALT(environment, entity):
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    update_environment(environment=environment, entity=entity)
