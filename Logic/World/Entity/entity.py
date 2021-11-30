@@ -1,14 +1,16 @@
 import random
 import string
 
-from Genetics.genetics import *
-from Model.model import Model
+from Entity.model import Model
+from Entity.genetics import *
+from Entity.Actions import individual, interactions, movement
+
 
 class Entity:
     """
         Entity class: Generates interactable entity objects [Ex. human, door, plant, monster, wall...]
     """
-    def __init__(self, properties=None):
+    def __init__(self, genome_length=10, properties=None):
         """
             Inner class declaration
         """
@@ -19,6 +21,7 @@ class Entity:
             External properties to load
         """
         self.properties = properties
+        self.genome_length = genome_length
         
         """
             Entity properties
@@ -32,7 +35,7 @@ class Entity:
         self.is_alive = True
         self.is_Male = random.choice([True, False])
         self.will_Flee = random.choice([True, False])
-        self.genome = generate_genome_RAND2HEX(length_genome=10)
+        self.genome = generate_genome_RAND2HEX(length_genome=self.genome_length)
         self.generation = 0
         self.age = 0
         self.size = 5
@@ -181,68 +184,53 @@ class Entity:
         def do_action(self, option=None):
             self.Entity.energy -= 1 #Subtracts 1 energy for movement
             # TODO check to make sure tile is not occupied, moves tile*velocity
+            '''movement'''
             if option == 'UP':
-                print("moving up")
-
+                movement.move_UP(self.environment, self.Entity)
             if option == 'DN':
-                print("moving dn")
-
+                movement.move_DN(self.environment, self.Entity)
             if option == 'L':
-                print("moving l")
-
+                movement.move_L(self.environment, self.Entity)
             if option == 'R':
-                print("moving r")
-
+                movement.move_R(self.environment, self.Entity)
             if option == 'UPR':
-                print("moving upr")
-
+                movement.move_UPR(self.environment, self.Entity)
             if option == 'UPL':
-                print("moving upl")
-
+                movement.move_UPL(self.environment, self.Entity)
             if option == 'DNR':
-                print("moving dnr")
-
+                movement.move_DNR(self.environment, self.Entity)
             if option == 'DNL':
-                print("moving dnl")
-
+                movement.move_DNL(self.environment, self.Entity)
             if option == 'RANDOM':
-                print("moving random")
-
+                movement.move_RANDOM(self.environment, self.Entity)
             if option == 'FORWARD':
-                print("moving fwd")
-
+                movement.move_FORWARD(self.environment, self.Entity)
             if option == 'REVERSE':
-                print("moving reverse")
-
+                movement.move_REVERSE(self.environment, self.Entity)
             if option == 'HALT':
-                print("halted")
-
-            if option == 'ATTACK':
-                print("attacking")
-
-            if option == 'MATE':
-                print("mating")
-
-            if option == 'REST':
-                print("resting")
-
-            if option == 'SHARE_FOOD':
-                print("sharing food")
-
-            if option == 'BURY':
-                print("burying")
-
-            if option == 'HUNT':
-                print("hunting")
-                
-            if option == 'HEAL_OTHER':
-                print("healing other")
+                movement.move_HALT(self.environment, self.Entity)
             
+            '''actions to other entities'''
+            if option == 'ATTACK':
+                interactions.interact_ATTACK(self.environment, self.Entity)
+            if option == 'MATE':
+                interactions.interact_MATE(self.environment, self.Entity)
+            if option == 'SHARE_FOOD':
+                interactions.interact_SHARE_FOOD(self.environment, self.Entity)
+            if option == 'BURY':
+                interactions.interact_BURY(self.environment, self.Entity)
+            if option == 'HUNT':
+                interactions.interact_HUNT(self.environment, self.Entity)
+            if option == 'HEAL_OTHER':
+                interactions.interact_HEAL_OTHER(self.environment, self.Entity)
             if option == 'PICK_PLANT':
-                print("picking plant")
-                
+                interactions.interact_PICK_PLANT(self.environment, self.Entity)
             if option == 'EAT_HUMAN':
-                print("eating human")
+                interactions.interact_EAT_HUMAN(self.environment, self.Entity)
+            
+            '''self goals'''
+            if option == 'REST':
+                individual.individual_REST(self.environment, self.Entity)
             
     class Brain:
         """
@@ -266,28 +254,27 @@ class Entity:
             '''sensory neurons'''
             self.input_neurons = {
             # Self identifiers (sensory neurons)
-            '0' : self.Entity.velocity/10,
-            '1' : self.Entity.direction/360,
-            '2' : (self.Entity.age)/100,
-            '3' : (self.Entity.size)/20,
-            '4' : (self.Entity.strength)/100,
-            '5' : (self.Entity.health)/100,
-            '6' : (self.Entity.children)/10,
-            '7' : (self.Entity.food)/100,
-            '8' : (self.Entity.liked)/100,
-            '9' : (self.Entity.energy)/100,
-            '10' : (self.Entity.job_tasks)/100,
-            '11' : [1 if self.Entity.is_starving else -1][0],
-            '12' : [1 if self.Entity.can_mate else -1][0],
+            '0' : self.Entity.velocity/10, # speed
+            '1' : self.Entity.direction/360, # direction(degrees)
+            '2' : (self.Entity.age)/100, # age
+            '3' : (self.Entity.size)/20, # size
+            '4' : (self.Entity.strength)/100, # strength
+            '5' : (self.Entity.health)/100, # health; constitution
+            '6' : (self.Entity.children)/10, # children
+            '7' : (self.Entity.food)/100, # food available
+            '8' : (self.Entity.liked)/100, # are they liked or not
+            '9' : (self.Entity.energy)/100, # how much energy do they have
+            '10' : (self.Entity.job_tasks)/100, # how many times have they done their job
+            '11' : [1 if self.Entity.is_starving else -1][0], # are they starving
+            '12' : [1 if self.Entity.can_mate else -1][0], # are they able to mate
             
             # random neurons and sensory mutations
-            '13' : random.random(),
-            '14' : random.getrandbits(1),
+            '13' : random.random(), # random values
+            '14' : random.getrandbits(1), # random bits
             
             # external identifiers
             ## Blockage x, y
             ## Population x, y
-            ## Total population
             ## Total enemies
             ## Total plants
             ## Total Other
@@ -397,8 +384,3 @@ class Entity:
                    Actions=self.Actions(environment=environment, Entity=self),
                    environment=environment
                    ).think()
-        
-
-entities = [Entity() for entity in range(1)]
-environment = [entity.export_entity_values() for entity in entities]
-environment = [entity.next(environment) for entity in entities]

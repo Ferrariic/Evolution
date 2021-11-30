@@ -9,7 +9,7 @@ class Model:
         self.input_neurons = input_neurons
         self.inner_neurons = inner_neurons
         self.output_neurons = output_neurons
-
+        
     def __sigmoid(self, x):
         return 1 / (1 + math.exp(-x))
     
