@@ -43,7 +43,7 @@ class Entity:
         self.health = random.randint(75,125)
         self.children = 0
         self.color = [random.randint(0,255), random.randint(0,255), random.randint(0,255)]
-        self.food = random.randint(10,20)
+        self.food = random.randint(80,100)
         self.is_starving = False
         self.liked = 0
         self.goal = None
@@ -146,8 +146,8 @@ class Entity:
         def __bound_stats(self):
             if self.Entity.energy > 100:
                 self.Entity.energy = 100
-            if self.Entity.energy < -100:
-                self.Entity.energy = -100
+            if self.Entity.energy < 0:
+                self.Entity.energy = 0
                 
             if self.Entity.liked > 100:
                 self.Entity.liked = 100
@@ -156,21 +156,50 @@ class Entity:
                 
             if self.Entity.food > 100:
                 self.Entity.food = 100
+            if self.Entity.food < 0:
+                self.Entity.food = 0
                 
             if self.Entity.health > 100:
                 self.Entity.health = 100
+            if self.Entity.health < 0:
+                self.Entity.health = 0
                 
             if self.Entity.strength > 100:
                 self.Entity.strength = 100
             if self.Entity.strength < 0:
                 self.Entity.strength = 0 
+                
+        def __world_decay(self):
+            '''constant decay states for the world'''
+            self.Entity.food -= 1 # Subtract 1 food per cycle
+            self.Entity.age += 1 # Add one age per cycle
+            
+        def __spend_stats(self):
+            
+            '''If the entity is weak, spend food to replenish energy'''
+            if (self.Entity.energy < 10) & (self.Entity.food > 5):
+                self.Entity.food -= 2
+                self.Entity.energy += 20
+            
+            '''If the entity is starving and has 0 food, subtract health'''
+            if self.Entity.food < 1:
+                self.Entity.health -= 5
+                self.Entity.energy -= 5
+
+            '''If the entity is starving and has 0 food, subtract health'''
+            if (self.Entity.health < 50) & (self.Entity.food > 2) & (self.Entity.energy > 5) :
+                self.Entity.food -= 2
+                self.Entity.energy -= 5
+                self.Entity.health += 5
             
         def update_status(self):
-            if not self.__check_is_alive():
+            self.__world_decay() # world stats reduced per cycle
+            self.__spend_stats() # stat upkeep
+            if not self.__check_is_alive(): # checks if dead
                 return {"status":"dead"}
-            self.__check_can_mate()
-            self.__check_is_starving()
-            self.__bound_stats()
+            self.__check_can_mate() # checks if can mate
+            self.__check_is_starving() # checks if starving
+            self.__bound_stats() # bounds stats depending on if out of range
             return {"status":"alive"}    
         
     class Actions:
@@ -182,8 +211,8 @@ class Entity:
             self.environment = environment
             
         def do_action(self, option=None):
-            self.Entity.energy -= 1 #Subtracts 1 energy for movement
-            # TODO check to make sure tile is not occupied, moves tile*velocity
+            if not ((self.Entity.energy > 1) & (self.Entity.is_alive)):
+                return
             '''movement'''
             if option == 'UP':
                 movement.move_UP(self.environment, self.Entity)
