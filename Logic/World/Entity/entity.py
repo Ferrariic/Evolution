@@ -1,66 +1,73 @@
 import random
 import string
+from os import environ
 
-from Genetics.genetics import *
-from Model.model import Model
+from Entity.Actions import direction, individual, interactions, movement
+from Entity.genetics import *
+from Entity.model import Model
+from Entity.status import Status
+
 
 class Entity:
     """
         Entity class: Generates interactable entity objects [Ex. human, door, plant, monster, wall...]
     """
-    def __init__(self, properties=None):
+    def __init__(self, genome_length=10, properties=None):
         """
             Inner class declaration
         """
-        self.Status # Updates Entity object status
         self.Brain # Entity Brain
         
         """
             External properties to load
         """
         self.properties = properties
+        self.genome_length = genome_length
         
         """
             Entity properties
         """
-        # Name of entity
+        
+        '''random name given'''
         self.name = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 12))
-        self.entity_type = 'human'
-        self.position = [random.randint(-10,10),random.randint(-10,10)]
-        self.velocity = random.randint(1,30)
+        
+        '''genetic assignments'''
+        self.genome = generate_genome_RAND2HEX(length_genome=self.genome_length)
+        self.velocity = assign_velocity_HEX2INT(self.genome)
+        self.is_Male = assign_male_HEX2BOOL(self.genome)
+        self.will_Flee = assign_flee_HEX2BOOL(self.genome)
+        self.color = assign_color_HEX2TRIPLE255(self.genome)
+        self.size = assign_size_HEX2INT7(self.genome)
+        self.strength = assign_strength_HEX2INT63(self.genome)
+        self.health = assign_health_HEX2INT127(self.genome)
+        
+        '''world properties'''
+        self.position = [random.randint(-300,300),random.randint(-300,300)]
         self.direction = random.randint(0,359)
-        self.is_alive = True
-        self.is_Male = random.choice([True, False])
-        self.will_Flee = random.choice([True, False])
-        self.genome = generate_genome_RAND2HEX(length_genome=10)
-        self.generation = 0
-        self.age = 0
-        self.size = 5
-        self.strength = random.randint(30,50)
-        self.health = random.randint(75,125)
-        self.children = 0
-        self.color = [random.randint(0,255), random.randint(0,255), random.randint(0,255)]
-        self.food = random.randint(10,20)
-        self.is_starving = False
-        self.liked = 0
-        self.goal = None
-        self.job_tasks = 0
-        self.energy = 100
+        
+        '''self properties'''
         self.inventory = []
+        self.food = 100
+        self.energy = 100
+        self.liked = 0
+        self.children = 0
+        self.generation = 0
+        self.age = 0    
+        self.is_starving = False
         self.can_mate = False
+        self.is_alive = True
         self.brain = None
         self.cause_of_death = None
         
         if self.properties is not None:
             self.name = self.properties['name']
-            self.entity_type = self.properties['entity_type']
+            self.genome = self.properties['genome']
             self.position = self.properties['position']
             self.velocity = self.properties['velocity']
             self.direction = self.properties['direction']
             self.is_alive = self.properties['is_Alive']
             self.is_Male = self.properties['is_Male']
             self.will_Flee = self.properties['will_Flee']
-            self.genome = self.properties['genome']
             self.generation =  self.properties['generation']
             self.age = self.properties['age']
             self.size = self.properties['size']
@@ -71,8 +78,6 @@ class Entity:
             self.food = self.properties['food']
             self.is_starving = self.properties['is_starving']
             self.liked = self.properties['liked']
-            self.goal = self.properties['goal']
-            self.job_tasks = self.properties['job_tasks']
             self.energy = self.properties['energy']
             self.inventory = self.properties['inventory']
             self.can_mate = self.properties['can_mate']
@@ -82,7 +87,6 @@ class Entity:
     def export_entity_values(self):
         properties = {
             'name':self.name,
-            'entity_type':self.entity_type,
             'position':self.position,
             'velocity':self.velocity,
             'direction':self.direction,
@@ -100,8 +104,6 @@ class Entity:
             'food':self.food,
             'is_starving':self.is_starving,
             'liked':self.liked,
-            'goal':self.goal,
-            'job_tasks':self.job_tasks,
             'energy':self.energy,
             'inventory':self.inventory,
             'can_mate':self.can_mate,
@@ -110,65 +112,14 @@ class Entity:
         }
         return properties
     
-    class Status:
-        """
-            Modifies status of Entity
-        """
-        def __init__(self, Entity):
-            self.Entity = Entity
-        
-        def __check_is_alive(self):
-            health_check = (self.Entity.health < 0)
-            if health_check:
-                self.Entity.is_alive = False
-                return False
-            return True
-        
-        def __check_can_mate(self):
-            age_lower_bound_check = (self.Entity.age > 18)
-            age_upper_bound_check = (self.Entity.age < 60)
-            food_check = (self.Entity.food > 0)
-            energy_check = (self.Entity.energy > 0)
-            
-            self.Entity.can_mate = False
-            if age_lower_bound_check & age_upper_bound_check & food_check & energy_check:
-                self.Entity.can_mate = True
-                
-        def __check_is_starving(self):
-            food_check = self.Entity.food > 0
-            self.Entity.is_starving = True
-            if food_check:
-                self.Entity.is_starving = False
-                
-        def __bound_stats(self):
-            if self.Entity.energy > 100:
-                self.Entity.energy = 100
-            if self.Entity.energy < -100:
-                self.Entity.energy = -100
-                
-            if self.Entity.liked > 100:
-                self.Entity.liked = 100
-            if self.Entity.liked < -100:
-                self.Entity.liked = -100
-                
-            if self.Entity.food > 100:
-                self.Entity.food = 100
-                
-            if self.Entity.health > 100:
-                self.Entity.health = 100
-                
-            if self.Entity.strength > 100:
-                self.Entity.strength = 100
-            if self.Entity.strength < 0:
-                self.Entity.strength = 0 
-            
-        def update_status(self):
-            if not self.__check_is_alive():
-                return {"status":"dead"}
-            self.__check_can_mate()
-            self.__check_is_starving()
-            self.__bound_stats()
-            return {"status":"alive"}    
+    def update_entity_values(environment, world_size):
+        status_list = []
+        for entity in environment['environment_json']:
+            entity_properties = Status(entity, world_size=world_size).update_status()['status']
+            if entity_properties == 'dead':
+                continue
+            status_list.append(entity_properties)
+        return [Entity(properties=entity) for entity in status_list] # generates new entities
         
     class Actions:
         """
@@ -179,70 +130,64 @@ class Entity:
             self.environment = environment
             
         def do_action(self, option=None):
-            self.Entity.energy -= 1 #Subtracts 1 energy for movement
-            # TODO check to make sure tile is not occupied, moves tile*velocity
-            if option == 'UP':
-                print("moving up")
-
-            if option == 'DN':
-                print("moving dn")
-
-            if option == 'L':
-                print("moving l")
-
-            if option == 'R':
-                print("moving r")
-
-            if option == 'UPR':
-                print("moving upr")
-
-            if option == 'UPL':
-                print("moving upl")
-
-            if option == 'DNR':
-                print("moving dnr")
-
-            if option == 'DNL':
-                print("moving dnl")
-
-            if option == 'RANDOM':
-                print("moving random")
-
-            if option == 'FORWARD':
-                print("moving fwd")
-
-            if option == 'REVERSE':
-                print("moving reverse")
-
-            if option == 'HALT':
-                print("halted")
-
-            if option == 'ATTACK':
-                print("attacking")
-
-            if option == 'MATE':
-                print("mating")
-
-            if option == 'REST':
-                print("resting")
-
-            if option == 'SHARE_FOOD':
-                print("sharing food")
-
-            if option == 'BURY':
-                print("burying")
-
-            if option == 'HUNT':
-                print("hunting")
-                
-            if option == 'HEAL_OTHER':
-                print("healing other")
+            if not ((self.Entity.energy > 1) & (self.Entity.is_alive)):
+                return
             
+            '''direction'''
+            if option == 'DIR_RIGHT':
+                direction.change_direction_RIGHT(self.environment, self.Entity)
+            if option == 'DIR_LEFT':
+                direction.change_direction_LEFT(self.environment, self.Entity)
+            if option == 'DIR_REVERSE':
+                direction.change_direction_REVERSE(self.environment, self.Entity)
+            
+            '''movement'''
+            if option == 'UP':
+                movement.move_UP(self.environment, self.Entity)
+            if option == 'DN':
+                movement.move_DN(self.environment, self.Entity)
+            if option == 'L':
+                movement.move_L(self.environment, self.Entity)
+            if option == 'R':
+                movement.move_R(self.environment, self.Entity)
+            if option == 'UPR':
+                movement.move_UPR(self.environment, self.Entity)
+            if option == 'UPL':
+                movement.move_UPL(self.environment, self.Entity)
+            if option == 'DNR':
+                movement.move_DNR(self.environment, self.Entity)
+            if option == 'DNL':
+                movement.move_DNL(self.environment, self.Entity)
+            if option == 'RANDOM':
+                movement.move_RANDOM(self.environment, self.Entity)
+            if option == 'FORWARD':
+                movement.move_FORWARD(self.environment, self.Entity)
+            if option == 'REVERSE':
+                movement.move_REVERSE(self.environment, self.Entity)
+            if option == 'HALT':
+                movement.move_HALT(self.environment, self.Entity)
+            
+            '''actions to other entities'''
+            if option == 'ATTACK':
+                interactions.interact_ATTACK(self.environment, self.Entity)
+            if option == 'MATE':
+                interactions.interact_MATE(self.environment, self.Entity)
+            if option == 'SHARE_FOOD':
+                interactions.interact_SHARE_FOOD(self.environment, self.Entity)
+            if option == 'BURY':
+                interactions.interact_BURY(self.environment, self.Entity)
+            if option == 'HUNT':
+                interactions.interact_HUNT(self.environment, self.Entity)
+            if option == 'HEAL_OTHER':
+                interactions.interact_HEAL_OTHER(self.environment, self.Entity)
             if option == 'PICK_PLANT':
-                print("picking plant")
-                
+                interactions.interact_PICK_PLANT(self.environment, self.Entity)
             if option == 'EAT_HUMAN':
-                print("eating human")
+                interactions.interact_EAT_HUMAN(self.environment, self.Entity)
+            
+            '''self goals'''
+            if option == 'REST':
+                individual.individual_REST(self.environment, self.Entity)
             
     class Brain:
         """
@@ -266,28 +211,26 @@ class Entity:
             '''sensory neurons'''
             self.input_neurons = {
             # Self identifiers (sensory neurons)
-            '0' : self.Entity.velocity/10,
-            '1' : self.Entity.direction/360,
-            '2' : (self.Entity.age)/100,
-            '3' : (self.Entity.size)/20,
-            '4' : (self.Entity.strength)/100,
-            '5' : (self.Entity.health)/100,
-            '6' : (self.Entity.children)/10,
-            '7' : (self.Entity.food)/100,
-            '8' : (self.Entity.liked)/100,
-            '9' : (self.Entity.energy)/100,
-            '10' : (self.Entity.job_tasks)/100,
-            '11' : [1 if self.Entity.is_starving else -1][0],
-            '12' : [1 if self.Entity.can_mate else -1][0],
+            '0' : self.Entity.velocity/10, # speed
+            '1' : self.Entity.direction/360, # direction(degrees)
+            '2' : (self.Entity.age)/100, # age
+            '3' : (self.Entity.size)/20, # size
+            '4' : (self.Entity.strength)/100, # strength
+            '5' : (self.Entity.health)/100, # health; constitution
+            '6' : (self.Entity.children)/10, # children
+            '7' : (self.Entity.food)/100, # food available
+            '8' : (self.Entity.liked)/100, # are they liked or not
+            '9' : (self.Entity.energy)/100, # how much energy do they have
+            '10' : [1 if self.Entity.is_starving else -1][0], # are they starving
+            '11' : [1 if self.Entity.can_mate else -1][0], # are they able to mate
             
             # random neurons and sensory mutations
-            '13' : random.random(),
-            '14' : random.getrandbits(1),
+            '12' : random.random(), # random values
+            '13' : random.getrandbits(1), # random bits
             
             # external identifiers
             ## Blockage x, y
             ## Population x, y
-            ## Total population
             ## Total enemies
             ## Total plants
             ## Total Other
@@ -338,6 +281,9 @@ class Entity:
                 '18': 'HEAL_OTHER',
                 '19': 'PICK_PLANT',
                 '20': 'EAT_HUMAN',
+                '21': 'DIR_RIGHT',
+                '22': 'DIR_LEFT',
+                '23': 'DIR_REVERSE',
             }
             
         def __build_brain_connections(self):
@@ -390,15 +336,7 @@ class Entity:
 
     '''NPC Commit Next Step'''
     def next(self, environment):
-        if self.Status(Entity=self).update_status()['status'] == 'dead':
-            return
-        
         self.Brain(Entity=self,
                    Actions=self.Actions(environment=environment, Entity=self),
                    environment=environment
                    ).think()
-        
-
-entities = [Entity() for entity in range(1)]
-environment = [entity.export_entity_values() for entity in entities]
-environment = [entity.next(environment) for entity in entities]
