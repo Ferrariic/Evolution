@@ -119,11 +119,11 @@ def interact_HUNT(environment, entity):
         return
     if not (entity.energy > 5):
         return
-    entity.energy -= 5
-    entity.position = interaction_target['position']
-    interaction_target['health'] = 0
-    interaction_target['is_Alive'] = False
-    interaction_target['cause_of_death'] = 'Hunted'
-    entity.food += (interaction_target['food'] + interaction_target['health']*interaction_target['size']) # takes their food
+    entity.energy = 200 #resets energy to full 
+    entity.position = interaction_target['position'] # sets position of entity on top of target
+    interaction_target['health'] = 0 # kills target
+    interaction_target['is_Alive'] = False # kills target
+    interaction_target['cause_of_death'] = 'Hunted' #cod hunted
+    entity.food += (interaction_target['food'] + interaction_target['health']*interaction_target['size']) # takes their food and some
     print(f"{entity.name} -HUNTED-> {interaction_target['name']}")
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)

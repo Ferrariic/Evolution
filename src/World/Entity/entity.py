@@ -244,10 +244,14 @@ class Entity:
             # Establish motor neurons and their outputs
             MOVEMENT_OUTPUTS = ['UP','DN','L','R','UPR','UPL','DNR','DNL','RANDOM','REVERSE','HALT']
             DIRECTION_VELOCITY_OUTPUTS = ['DIR_RIGHT','DIR_LEFT','DIR_REVERSE','VEL_REDUCE','VEL_INCREASE']
-            INTERACTION_OUTPUTS = ['ATTACK','MATE','SHARE_FOOD','HEAL_OTHER','HUNT']
-            INDIVIDUAL_OUTPUTS = ['REST','SELF_REPLICATE']
+            INTERACTION_OUTPUTS = ['ATTACK','SHARE_FOOD','HEAL_OTHER','HUNT']
+            INDIVIDUAL_OUTPUTS = ['REST']
+            MATE_OUTPUTS = ['MATE','SELF_REPLICATE']
 
-            OUTPUTS = MOVEMENT_OUTPUTS+DIRECTION_VELOCITY_OUTPUTS+INTERACTION_OUTPUTS+INDIVIDUAL_OUTPUTS
+            OUTPUTS = MOVEMENT_OUTPUTS+\
+                    DIRECTION_VELOCITY_OUTPUTS+\
+                    INTERACTION_OUTPUTS+\
+                    INDIVIDUAL_OUTPUTS+MATE_OUTPUTS
             self.output_neurons = {str(key):value for key,value in enumerate(OUTPUTS)}
             
         def __build_brain_connections(self):

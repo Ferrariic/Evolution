@@ -11,7 +11,7 @@ def generate_genome_RAND2HEX(length_genome=10):
 def decode_genome_HEX2BIN(genome, mutate=True):
     bingenome = [bin(int(hexgene,16))[2:].zfill(32) for hexgene in genome.split(' ')]
     if mutate:
-        bingenome = textwrap.wrap(''.join([str(1-int(bit)) if (random.randint(1, 128)==1) else bit for gene in bingenome for bit in gene]), 32)
+        bingenome = textwrap.wrap(''.join([str(1-int(bit)) if (random.randint(1, 64)==1) else bit for gene in bingenome for bit in gene]), 32)
     return bingenome
 
 '''encoding from bin to hex'''

@@ -75,7 +75,6 @@ class Sensors:
         direction = math.degrees(math.atan2(int(y1-y0), int(x1-x0)))/360
         return direction
     
-    
     # external identifiers
     ## Blockage x, y
     ## Population x, y
