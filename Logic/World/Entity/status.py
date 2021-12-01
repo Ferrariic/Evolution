@@ -38,7 +38,7 @@ class Status:
         return True
     
     def __check_can_mate(self):
-        age_lower_bound_check = (self.age > 18)
+        age_lower_bound_check = (self.age > 10)
         food_check = (self.food > 0)
         energy_check = (self.energy > 0)
         
@@ -79,20 +79,26 @@ class Status:
             self.strength = 0
             
         ### Optional world bounds
+        # works for square worlds
+        world_wrap=False
+        wrap = 1
+        if world_wrap:
+            wrap = -1
+            
         x, y = self.position[0], self.position[1]
         if (x>self.world_size[0][1]):
-            self.position[0]=self.world_size[0][1]
+            self.position[0]=wrap*self.world_size[0][1]
         if (x<self.world_size[0][0]):
-            self.position[0]=self.world_size[0][0]
+            self.position[0]=wrap*self.world_size[0][0]
         if (y>self.world_size[1][1]):
-            self.position[1]=self.world_size[1][1]
+            self.position[1]=wrap*self.world_size[1][1]
         if (y<self.world_size[1][0]):
-            self.position[1]=self.world_size[1][0]
+            self.position[1]=wrap*self.world_size[1][0]
             
     def __world_decay(self):
         '''constant decay states for the world'''
         genome_length = len(self.genome.split(' '))
-        self.food -= (1+0.1*genome_length) # Subtract 1 food per cycle, times a genome length modifier
+        self.food -= (1+(0.025*genome_length)+(0.5*self.size)) # Subtract 1 food per cycle, times a genome length modifier
         self.age += 1 # Add one age per cycle
         
     def __spend_stats(self):
@@ -100,7 +106,7 @@ class Status:
         '''If the entity is weak, spend food to replenish energy'''
         if (self.energy < 10) & (self.food > 5):
             self.food -= 2
-            self.energy += 20
+            self.energy += 50
         
         '''If the entity is starving and has 0 food, subtract health'''
         if self.is_starving:
@@ -108,7 +114,7 @@ class Status:
             self.energy -= 5
 
         '''If the entity is injured, heal'''
-        if ((self.health < 50) & (self.food > 2) & (self.energy > 5)) & ~(self.is_starving):
+        if ((self.health < 50) & (self.food > 2) & (self.energy > 5)) & (not self.is_starving):
             self.food -= 2
             self.energy -= 5
             self.health += 5

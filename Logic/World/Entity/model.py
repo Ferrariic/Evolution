@@ -86,7 +86,6 @@ class Model:
                 output_values[key] = self.__sigmoid(value)
             except:
                 pass
-
         try:
             best_choice = max(output_values, key=output_values.get)
         except:

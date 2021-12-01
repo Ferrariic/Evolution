@@ -8,8 +8,8 @@ import random
 """
     Interaction backup functions
 """
-def closest_node(environment, entity):
-    nodes = environment['all_entity_locations']
+def closest_node(environment, entity, distance_threshold=8):
+    nodes = environment['all_entity_locations'][:]
     node = entity.position
     nodes.remove(node)
     
@@ -19,8 +19,10 @@ def closest_node(environment, entity):
     x0, y0 = node
     x1, y1 = closest_node
     displacement = abs((((x0-x1)**2)+((y0-y1)**2))**(1/2))
-    if displacement <= 10: # REMOVE RANGE SET 10
+    if displacement <= distance_threshold:
         interacting_with = environment['environment_json'][closest_node_index]
+        if interacting_with['name'] == entity.name:
+            return None
         return interacting_with
     return None
 
@@ -44,10 +46,12 @@ def interact_ATTACK(environment, entity):
         return
     # Logic for interaction
     entity.energy -= 5
-    interaction_target['health'] -= entity.strength
+    interaction_target['health'] -= entity.strength*entity.size
+    print(f"{entity.name} -ATTACKED-> {interaction_target['name']}")
     if interaction_target['health'] < 0:
-        interaction_target['cause_of_death'] = 'Attacked, and died.'
-        entity.food += interaction_target['food'] # takes their food
+        print(f"{entity.name} -KILLED-> {interaction_target['name']}")
+        interaction_target['cause_of_death'] = 'Attacked'
+        entity.food += (interaction_target['food'] + interaction_target['health']*interaction_target['size']) # takes their food
     
     # Update environment
     update_environment(environment, entity, interaction_target)
@@ -69,6 +73,11 @@ def interact_MATE(environment, entity):
     
     '''builds child'''
     new_entity = mate_parents_OBJ_DICT(entity=entity, interaction_target=interaction_target)
+    
+    child_name = new_entity['name']
+    parent_name = interaction_target['name']
+    print(f'{parent_name} -MATED-> {entity.name} | CHILD: {child_name}')
+    
     update_environment(environment, entity, interaction_target) # Update parents to field
     environment['environment_json'].append(new_entity)
     
@@ -84,28 +93,10 @@ def interact_SHARE_FOOD(environment, entity):
     entity.food -= 10
     entity.liked += 10
     interaction_target['food'] += 10
+    
+    print(f"{entity.name} -SHARING FOOD-> {interaction_target['name']}")
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
 
-def interact_BURY(environment, entity):
-    interaction_target = closest_node(environment, entity)
-    if interaction_target is None:
-        return
-    if interaction_target['is_Alive']:
-        return
-    if not (entity.energy > 5):
-        return
-    entity.energy -= 5
-
-def interact_HUNT(environment, entity):
-    interaction_target = closest_node(environment, entity)
-    if interaction_target is None:
-        return
-    if not interaction_target['is_Alive']:
-        return
-    if not (entity.energy > 5):
-        return
-    entity.energy -= 5
-    
 def interact_HEAL_OTHER(environment, entity):
     interaction_target = closest_node(environment, entity)
     if interaction_target is None:
@@ -117,10 +108,11 @@ def interact_HEAL_OTHER(environment, entity):
     entity.energy -= 5
     entity.food -= 2
     interaction_target['health'] += 20
+    print(f"{entity.name} -HEALING-> {interaction_target['name']}")
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
-
-def interact_PICK_PLANT(environment, entity):
-    interaction_target = closest_node(environment, entity)
+    
+def interact_HUNT(environment, entity):
+    interaction_target = closest_node(environment, entity, distance_threshold=10)
     if interaction_target is None:
         return
     if not interaction_target['is_Alive']:
@@ -128,11 +120,10 @@ def interact_PICK_PLANT(environment, entity):
     if not (entity.energy > 5):
         return
     entity.energy -= 5
-
-def interact_EAT_HUMAN(environment, entity):
-    interaction_target = closest_node(environment, entity)
-    if interaction_target is None:
-        return
-    if not (entity.energy > 5):
-        return
-    entity.energy -= 5
+    entity.position = interaction_target['position']
+    interaction_target['health'] = 0
+    interaction_target['is_Alive'] = False
+    interaction_target['cause_of_death'] = 'Hunted'
+    entity.food += (interaction_target['food'] + interaction_target['health']*interaction_target['size']) # takes their food
+    print(f"{entity.name} -HUNTED-> {interaction_target['name']}")
+    update_environment(environment=environment, entity=entity, interaction_target=interaction_target)

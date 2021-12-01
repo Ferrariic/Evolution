@@ -11,7 +11,7 @@ def generate_genome_RAND2HEX(length_genome=10):
 def decode_genome_HEX2BIN(genome, mutate=True):
     bingenome = [bin(int(hexgene,16))[2:].zfill(32) for hexgene in genome.split(' ')]
     if mutate:
-        bingenome = textwrap.wrap(''.join([str(1-int(bit)) if (random.randint(1, 100)==1) else bit for gene in bingenome for bit in gene]), 32)
+        bingenome = textwrap.wrap(''.join([str(1-int(bit)) if (random.randint(1, 128)==1) else bit for gene in bingenome for bit in gene]), 32)
     return bingenome
 
 '''encoding from bin to hex'''
@@ -38,21 +38,17 @@ def translate_genome_HEX2OUT(genome):
     
 '''cross over for mating'''
 def cross_over_HEX_A_HEX(genome1, genome2):
-    DNA1 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome1, mutate=True)).split(' ')
-    DNA2 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome2, mutate=True)).split(' ')
+  DNA1 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome1, mutate=True)).split(' ')
+  DNA2 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome2, mutate=True)).split(' ')
 
-    DNA1_crossover = int(len(DNA1)/2)+random.randint(-2,2)
-    DNA2_crossover = int(len(DNA2)/2)+random.randint(-2,2)
+  pool = DNA1+DNA2
+  cap = random.choice([DNA1[0],DNA2[0]])
+  objective_length = int(((len(DNA1)+len(DNA2))/2)+random.randint(-1,1))
+  if objective_length < 1:
+    objective_length = 1
 
-    DNA1_genes = random.choice([DNA1[DNA1_crossover:], DNA1[:DNA1_crossover]])
-    DNA2_genes = random.choice([DNA2[DNA2_crossover:], DNA2[:DNA2_crossover]])
-    
-    GENOME = ' '.join(random.choice([DNA1_genes+DNA2_genes, DNA2_genes+DNA1_genes]))
-    
-    if GENOME == '':
-        GENOME = random.choice([genome1, genome2])
-
-    return GENOME
+  genome = [cap]+random.choices(pool, k=objective_length)
+  return ' '.join(genome)
 
 
 """
@@ -75,16 +71,16 @@ def assign_flee_HEX2BOOL(genome):
     return [True if int(decode_genome_HEX2BIN(genome, mutate=False)[0][1])==1 else False][0]
 
 def assign_health_HEX2INT127(genome):
-    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][5:12],2)
+    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][5:12],2)+1
 
 def assign_velocity_HEX2INT(genome):
-    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][0:5],2)
+    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][0:5],2)+1
 
 def assign_strength_HEX2INT63(genome):
-    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][12:18],2)
+    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][12:18],2)+1
 
 def assign_size_HEX2INT7(genome):
-    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][24:27],2)
+    return int(decode_genome_HEX2BIN(genome, mutate=False)[0][24:27],2)+1
 
 def assign_color_HEX2TRIPLE255(genome):
     color1 = int(decode_genome_HEX2BIN(genome, mutate=False)[0][0:8],2)
@@ -119,7 +115,7 @@ def mate_parents_OBJ_DICT(entity, interaction_target):
     new_entity['is_starving'] = False
     new_entity['job_tasks'] = 0
     new_entity['inventory'] = []
-    new_entity['position'] = [random.randint(-300,300),random.randint(-300,300)]
+    new_entity['position'] = [random.randint(-64,64),random.randint(-64,64)]
     new_entity['generation'] = int(max([entity.generation,interaction_target['generation']])+1)
     new_entity['cause_of_death'] = None
     return new_entity
@@ -149,7 +145,7 @@ def mate_parents_OBJ_OBJ(entity1, entity2):
     new_entity['is_starving'] = False
     new_entity['liked'] = 0
     new_entity['inventory'] = []
-    new_entity['position'] = [random.randint(-300,300),random.randint(-300,300)]
+    new_entity['position'] = [random.randint(-64,64),random.randint(-64,64)]
 
     new_entity['cause_of_death'] = None
     return new_entity

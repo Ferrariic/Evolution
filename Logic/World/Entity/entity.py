@@ -6,7 +6,7 @@ from Entity.Actions import direction, individual, interactions, movement
 from Entity.genetics import *
 from Entity.model import Model
 from Entity.status import Status
-
+from Entity.Sensors.sensors import Sensors
 
 class Entity:
     """
@@ -42,7 +42,7 @@ class Entity:
         self.health = assign_health_HEX2INT127(self.genome)
         
         '''world properties'''
-        self.position = [random.randint(-300,300),random.randint(-300,300)]
+        self.position = [random.randint(-64,64),random.randint(-64,64)]
         self.direction = random.randint(0,359)
         
         '''self properties'''
@@ -174,24 +174,20 @@ class Entity:
                 interactions.interact_MATE(self.environment, self.Entity)
             if option == 'SHARE_FOOD':
                 interactions.interact_SHARE_FOOD(self.environment, self.Entity)
-            if option == 'BURY':
-                interactions.interact_BURY(self.environment, self.Entity)
             if option == 'HUNT':
                 interactions.interact_HUNT(self.environment, self.Entity)
             if option == 'HEAL_OTHER':
                 interactions.interact_HEAL_OTHER(self.environment, self.Entity)
-            if option == 'PICK_PLANT':
-                interactions.interact_PICK_PLANT(self.environment, self.Entity)
-            if option == 'EAT_HUMAN':
-                interactions.interact_EAT_HUMAN(self.environment, self.Entity)
             
             '''self goals'''
             if option == 'REST':
                 individual.individual_REST(self.environment, self.Entity)
+            if option == 'SELF_REPLICATE':
+                individual.individual_SELF_REPLICATE(self.environment, self.Entity)
             
     class Brain:
         """
-            Thinks for entity; Maybe add IQ so doors don't start walking around (?)
+            Thinks for entity;
         """
         def __init__(self, Entity, Actions, environment):
             self.Entity = Entity
@@ -207,54 +203,39 @@ class Entity:
                 inter neurons
                 output neurons
             """
-            
+            sensor = Sensors(entity=self.Entity, environment=self.environment)
+            x_proximity, y_proximity = sensor.proximity_to_neighbor_XY()
             '''sensory neurons'''
             self.input_neurons = {
             # Self identifiers (sensory neurons)
-            '0' : self.Entity.velocity/10, # speed
-            '1' : self.Entity.direction/360, # direction(degrees)
-            '2' : (self.Entity.age)/100, # age
-            '3' : (self.Entity.size)/20, # size
-            '4' : (self.Entity.strength)/100, # strength
-            '5' : (self.Entity.health)/100, # health; constitution
-            '6' : (self.Entity.children)/10, # children
-            '7' : (self.Entity.food)/100, # food available
-            '8' : (self.Entity.liked)/100, # are they liked or not
-            '9' : (self.Entity.energy)/100, # how much energy do they have
-            '10' : [1 if self.Entity.is_starving else -1][0], # are they starving
-            '11' : [1 if self.Entity.can_mate else -1][0], # are they able to mate
+            '0' : sensor.velocity(),
+            '1' : sensor.direction(),
+            '2' : sensor.age(),
+            '3' : sensor.size(),
+            '4' : sensor.strength(), # strength
+            '5' : sensor.health(), # health; constitution
+            '6' : sensor.children(), # children
+            '7' : sensor.food(), # food available
+            '8' : sensor.liked(), # are they liked or not
+            '9' : sensor.energy(), # how much energy do they have
+            '10' : sensor.starving(), # are they starving
+            '11' : sensor.mate(), # are they able to mate
             
             # random neurons and sensory mutations
             '12' : random.random(), # random values
-            '13' : random.getrandbits(1), # random bits
-            
-            # external identifiers
-            ## Blockage x, y
-            ## Population x, y
-            ## Total enemies
-            ## Total plants
-            ## Total Other
-            ## Proximity to next friend x, y
-            ## Proximity to next enemy x, y
-            ## Proximity to next plant x, y
-            ## Proximity to next entity that can be mated x, y
-            ## Proximity to next entity that can be fought x, y
-            ## Proximity to world edge x, y
+            '13' : x_proximity, # proximity to neighbor
+            '14' : y_proximity, ## proximity to neighbor
+            '15' : sensor.direction_to_neighbor(),
             }
 
             '''inner neurons'''
             # Establish inner neurons and their goals
             self.inner_neurons = {
-                '0':random.random(),
-                '1':random.random(),
-                '2':random.random(),
-                '3':random.random(),
-                '4':random.random(),
-                '5':random.random(),
-                '6':random.random(),
-                '7':random.random(),
-                '8':random.random(),
-                '9':random.random(),
+                '0':0,
+                '1':0,
+                '2':0,
+                '3':0,
+                '4':0,
             }
             
             '''output neurons'''
@@ -276,14 +257,12 @@ class Entity:
                 '13': 'MATE',
                 '14': 'REST',
                 '15': 'SHARE_FOOD',
-                '16': 'BURY',
-                '17': 'HUNT',
-                '18': 'HEAL_OTHER',
-                '19': 'PICK_PLANT',
-                '20': 'EAT_HUMAN',
-                '21': 'DIR_RIGHT',
-                '22': 'DIR_LEFT',
-                '23': 'DIR_REVERSE',
+                '16': 'HEAL_OTHER',
+                '17': 'DIR_RIGHT',
+                '18': 'DIR_LEFT',
+                '19': 'DIR_REVERSE',
+                '20': 'SELF_REPLICATE',
+                '21': 'HUNT',
             }
             
         def __build_brain_connections(self):
