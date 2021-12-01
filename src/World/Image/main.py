@@ -1,12 +1,17 @@
 import cv2
-class GameWindow:
-    def __init__(self, window_size_x, window_size_y):
-        self.window_size_x = window_size_x
-        self.window_size_y = window_size_y
+import numpy as np
+
+class DrawGame:
+    
+    def __init__(self, window_width, window_height):
+        self.window_width = window_width
+        self.window_height = window_height
+    
+    def play(self):
+        main_screen = np.zeros([self.window_height, self.window_width, 3], dtype=np.uint8)
+        main_screen[:,:] = [0,0,0]
         
-    def start(self):
-        main_screen = [self.window_size_y, self.window_size_x, 3] = [0,0,0]
-        cv2.imshow('Cataclysm-Evolution', main_screen)
+        cv2.imshow('Cataclysm-Evolution',main_screen)
         cv2.waitKey()
         
-GameWindow(window_size_x=1920, window_size_y=1080).start()
+DrawGame(window_width=1280, window_height=720).play()

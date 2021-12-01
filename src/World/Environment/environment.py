@@ -10,3 +10,4 @@ class Environment:
             'all_entity_names':[env['name'] for env in self.environment_json],
             'environment_json':self.environment_json
         }
+        return environment

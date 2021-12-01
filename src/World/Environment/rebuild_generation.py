@@ -20,7 +20,7 @@ class Generation:
             new_ent_dict = mate_parents_OBJ_OBJ(entity1=entity1, entity2=entity2)
             entity_list.append(Entity(properties=new_ent_dict))
             
-        with open("Logic/World/Data/data.json", 'w') as f:
+        with open("src/World/Data/data.json", 'w') as f:
             json.dump(environment, f)
         return entity_list
         
