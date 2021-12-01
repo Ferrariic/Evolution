@@ -2,8 +2,9 @@ class Status:
     """
         Modifies internal status of Entity
     """
-    def __init__(self, properties):
+    def __init__(self, properties, world_size):
         self.properties = properties
+        self.world_size = world_size
         
         self.name = self.properties['name']
         self.position = self.properties['position']
@@ -79,15 +80,14 @@ class Status:
             
         ### Optional world bounds
         x, y = self.position[0], self.position[1]
-        world_size = [[-1000,1000],[-1000,1000]]
-        if (x>world_size[0][1]):
-            self.position[0]=world_size[0][1]
-        if (x<world_size[0][0]):
-            self.position[0]=world_size[0][0]
-        if (y>world_size[1][1]):
-            self.position[1]=world_size[1][1]
-        if (y<world_size[1][0]):
-            self.position[1]=world_size[1][0]
+        if (x>self.world_size[0][1]):
+            self.position[0]=self.world_size[0][1]
+        if (x<self.world_size[0][0]):
+            self.position[0]=self.world_size[0][0]
+        if (y>self.world_size[1][1]):
+            self.position[1]=self.world_size[1][1]
+        if (y<self.world_size[1][0]):
+            self.position[1]=self.world_size[1][0]
             
     def __world_decay(self):
         '''constant decay states for the world'''

@@ -42,7 +42,7 @@ class Entity:
         self.health = assign_health_HEX2INT127(self.genome)
         
         '''world properties'''
-        self.position = [random.randint(-10,10),random.randint(-10,10)]
+        self.position = [random.randint(-300,300),random.randint(-300,300)]
         self.direction = random.randint(0,359)
         
         '''self properties'''
@@ -112,10 +112,10 @@ class Entity:
         }
         return properties
     
-    def update_entity_values(environment):
+    def update_entity_values(environment, world_size):
         status_list = []
         for entity in environment['environment_json']:
-            entity_properties = Status(entity).update_status()['status']
+            entity_properties = Status(entity, world_size=world_size).update_status()['status']
             if entity_properties == 'dead':
                 continue
             status_list.append(entity_properties)

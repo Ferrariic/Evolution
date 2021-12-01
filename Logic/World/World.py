@@ -1,23 +1,28 @@
+from os import environ
 from Entity.entity import Entity 
 from Environment.environment import Environment
 from Environment.rebuild_generation import Generation
+from Image.draw_screen import DrawImage
 
-starting_population = 100
-lower_bound_threshold = 10
-step_years = 250
-generation_cycles = 100
-
-entities = [Entity(genome_length=10) for entity in range(starting_population)]
+starting_population = 500
+lower_bound_threshold = 200
+step_years = 200
+generation_cycles = 10
+world_size=[[-300, 300],[-300, 300]]
+draw = DrawImage(world_size=world_size)
+entities = [Entity(genome_length=2) for entity in range(starting_population)]
 if __name__ == '__main__':
     for generation in range(generation_cycles):
         for year in range(step_years):
             environment = Environment(environment_json=[entity.export_entity_values() for entity in entities]).export_environment_variables() # export environment
-            [entity.next(environment) for entity in entities] # entities do actions
-            entities = Entity.update_entity_values(environment=environment) # update environment entities
+            draw.draw_environment(environment=environment)
             if len(environment['environment_json']) <= lower_bound_threshold:
-                print("Population low-limit reached. Breaking.")
                 break
+            
+            [entity.next(environment) for entity in entities] # entities do actions
+            entities = Entity.update_entity_values(environment=environment, world_size=world_size) # update environment entities
             print(f"year: {year}, population {len(environment['environment_json'])}")
+            
         print(f"Generation {generation} completed. Population: {len(environment['environment_json'])}")
-        entities = Generation(entities=entities, population_limit=starting_population).rebuild_population()
         Generation(entities=entities, population_limit=starting_population).statistics()
+        entities = Generation(entities=entities, population_limit=starting_population).rebuild_population()
