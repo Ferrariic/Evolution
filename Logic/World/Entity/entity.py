@@ -44,6 +44,7 @@ class Entity:
         '''world properties'''
         self.position = [random.randint(-64,64),random.randint(-64,64)]
         self.direction = random.randint(0,359)
+        self.current_velocity = self.velocity
         
         '''self properties'''
         self.inventory = []
@@ -64,6 +65,7 @@ class Entity:
             self.genome = self.properties['genome']
             self.position = self.properties['position']
             self.velocity = self.properties['velocity']
+            self.current_velocity = self.properties['current_velocity']
             self.direction = self.properties['direction']
             self.is_alive = self.properties['is_Alive']
             self.is_Male = self.properties['is_Male']
@@ -89,6 +91,7 @@ class Entity:
             'name':self.name,
             'position':self.position,
             'velocity':self.velocity,
+            'current_velocity':self.current_velocity,
             'direction':self.direction,
             'is_Alive':self.is_alive,
             'is_Male':self.is_Male,
@@ -140,6 +143,10 @@ class Entity:
                 direction.change_direction_LEFT(self.environment, self.Entity)
             if option == 'DIR_REVERSE':
                 direction.change_direction_REVERSE(self.environment, self.Entity)
+            if option == 'VEL_REDUCE':
+                direction.change_direction_REDUCE_VELOCITY(self.environment, self.Entity)
+            if option == 'VEL_INCREASE':
+                direction.change_direction_INCREASE_VELOCITY(self.environment, self.Entity)
             
             '''movement'''
             if option == 'UP':
@@ -230,40 +237,18 @@ class Entity:
 
             '''inner neurons'''
             # Establish inner neurons and their goals
-            self.inner_neurons = {
-                '0':0,
-                '1':0,
-                '2':0,
-                '3':0,
-                '4':0,
-            }
+            INNER_NEURONS = 1
+            self.inner_neurons = {str(key):0 for key in range(INNER_NEURONS)}
             
             '''output neurons'''
             # Establish motor neurons and their outputs
-            self.output_neurons = {
-                '0': 'UP',
-                '1': 'DN',
-                '2': 'L',
-                '3': 'R',
-                '4': 'UPR',
-                '5': 'UPL',
-                '6': 'DNR',
-                '7': 'DNL',
-                '8': 'RANDOM',
-                '9': 'FORWARD',
-                '10': 'REVERSE',
-                '11': 'HALT',
-                '12': 'ATTACK',
-                '13': 'MATE',
-                '14': 'REST',
-                '15': 'SHARE_FOOD',
-                '16': 'HEAL_OTHER',
-                '17': 'DIR_RIGHT',
-                '18': 'DIR_LEFT',
-                '19': 'DIR_REVERSE',
-                '20': 'SELF_REPLICATE',
-                '21': 'HUNT',
-            }
+            MOVEMENT_OUTPUTS = ['UP','DN','L','R','UPR','UPL','DNR','DNL','RANDOM','REVERSE','HALT']
+            DIRECTION_VELOCITY_OUTPUTS = ['DIR_RIGHT','DIR_LEFT','DIR_REVERSE','VEL_REDUCE','VEL_INCREASE']
+            INTERACTION_OUTPUTS = ['ATTACK','MATE','SHARE_FOOD','HEAL_OTHER','HUNT']
+            INDIVIDUAL_OUTPUTS = ['REST','SELF_REPLICATE']
+
+            OUTPUTS = MOVEMENT_OUTPUTS+DIRECTION_VELOCITY_OUTPUTS+INTERACTION_OUTPUTS+INDIVIDUAL_OUTPUTS
+            self.output_neurons = {str(key):value for key,value in enumerate(OUTPUTS)}
             
         def __build_brain_connections(self):
             instructions = translate_genome_HEX2OUT(genome=self.Entity.genome) # loads instructions for brain

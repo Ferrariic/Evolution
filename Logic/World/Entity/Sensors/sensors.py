@@ -76,7 +76,6 @@ class Sensors:
         return direction
     
     
-    
     # external identifiers
     ## Blockage x, y
     ## Population x, y

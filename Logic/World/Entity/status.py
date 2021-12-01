@@ -9,6 +9,7 @@ class Status:
         self.name = self.properties['name']
         self.position = self.properties['position']
         self.velocity = self.properties['velocity']
+        self.current_velocity = self.properties['current_velocity']
         self.direction = self.properties['direction']
         self.is_alive = self.properties['is_Alive']
         self.is_Male = self.properties['is_Male']
@@ -98,7 +99,7 @@ class Status:
     def __world_decay(self):
         '''constant decay states for the world'''
         genome_length = len(self.genome.split(' '))
-        self.food -= (1+(0.025*genome_length)+(0.5*self.size)) # Subtract 1 food per cycle, times a genome length modifier
+        self.food -= (1+(0.025*genome_length)+(0.025*self.size)+(0.01*self.current_velocity)) # Subtract 1 food per cycle, times a genome length modifier
         self.age += 1 # Add one age per cycle
         
     def __spend_stats(self):
@@ -124,6 +125,7 @@ class Status:
             'name':self.name,
             'position':self.position,
             'velocity':self.velocity,
+            'current_velocity':self.current_velocity,
             'direction':self.direction,
             'is_Alive':self.is_alive,
             'is_Male':self.is_Male,

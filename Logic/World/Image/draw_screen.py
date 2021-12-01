@@ -28,7 +28,7 @@ class DrawImage:
         x_max = abs(self.world_size[0][0]) + abs(self.world_size[0][1])
         y_max = abs(self.world_size[1][0]) + abs(self.world_size[1][1])
         world = np.zeros([x_max+5, y_max+5, 3], dtype=np.uint8)
-        world[:,:] = [255,255,255]
+        world[:,:] = [0,0,0]
         
         for x, y, color, size in self.world_information:
             world[x:x+size,y:y+size] = color

@@ -38,17 +38,35 @@ def translate_genome_HEX2OUT(genome):
     
 '''cross over for mating'''
 def cross_over_HEX_A_HEX(genome1, genome2):
-  DNA1 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome1, mutate=True)).split(' ')
-  DNA2 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome2, mutate=True)).split(' ')
+    def random_engine(genome1, genome2):
+        DNA1 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome1, mutate=True)).split(' ')
+        DNA2 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome2, mutate=True)).split(' ')
 
-  pool = DNA1+DNA2
-  cap = random.choice([DNA1[0],DNA2[0]])
-  objective_length = int(((len(DNA1)+len(DNA2))/2)+random.randint(-1,1))
-  if objective_length < 1:
-    objective_length = 1
+        pool = DNA1+DNA2
+        cap = random.choice([DNA1[0],DNA2[0]])
+        objective_length = int(((len(DNA1)+len(DNA2))/2)+random.randint(-1,1))
+        if objective_length < 1:
+            objective_length = 1
 
-  genome = [cap]+random.choices(pool, k=objective_length)
-  return ' '.join(genome)
+        genome = [cap]+random.choices(pool, k=objective_length)
+        return genome
+        
+    def cross_over_engine(genome1, genome2):
+        DNA1 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome1, mutate=True)).split(' ')
+        DNA2 = encode_genome_BIN2HEX(decode_genome_HEX2BIN(genome2, mutate=True)).split(' ')
+
+        pool = DNA1+DNA2
+        cap = random.choice([DNA1[0],DNA2[0]])
+        objective_length = int(((len(DNA1)+len(DNA2))/2)+random.randint(-1,1))
+        if objective_length < 1:
+            objective_length = 1
+
+
+        genome = [cap]+random.choice([DNA1[1:]+DNA2[1:],DNA2[1:]+DNA1[1:]])[:objective_length]
+        return genome
+    
+    genome = cross_over_engine(genome1, genome2)
+    return ' '.join(genome)
 
 
 """
@@ -102,6 +120,7 @@ def mate_parents_OBJ_DICT(entity, interaction_target):
     new_entity['size'] = assign_size_HEX2INT7(new_entity['genome'])
     new_entity['color'] = assign_color_HEX2TRIPLE255(new_entity['genome'])
     new_entity['velocity'] = assign_velocity_HEX2INT(new_entity['genome'])
+    new_entity['current_velocity'] = new_entity['velocity'] 
     new_entity['will_Flee'] = assign_flee_HEX2BOOL(new_entity['genome'])
     new_entity['food'] = 100
     new_entity['children'] = 0
@@ -133,6 +152,7 @@ def mate_parents_OBJ_OBJ(entity1, entity2):
     new_entity['health'] = assign_health_HEX2INT127(new_entity['genome'])
     new_entity['color'] = assign_color_HEX2TRIPLE255(new_entity['genome'])
     new_entity['is_Male'] = assign_male_HEX2BOOL(new_entity['genome'])
+    new_entity['current_velocity'] = new_entity['velocity'] 
     new_entity['food'] = 100
     new_entity['generation'] = int(max([entity1.generation, entity2.generation])+1)
     new_entity['children'] = 0
