@@ -5,9 +5,9 @@ from Environment.rebuild_generation import Generation
 from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 
-starting_population = 20
+starting_population = 500
 lower_bound_threshold = int(starting_population/3)
-step_years = 200
+step_years = 10
 generation_cycles = 10000
 world_size=[[-128, 128],[-128, 128]] # 128, 128
 
@@ -28,7 +28,7 @@ if __name__ == '__main__':
         
         population = len(environment['environment_json'])
         print(f"----------------------{generation=}---{year=}---{population=}----------------------")
-        entities = Filter(entities=entities).filter_population()
+        #entities = Filter(entities=entities).filter_population()
         
         Generation(entities=entities, population_limit=starting_population).statistics()
         entities = Generation(entities=entities, population_limit=starting_population).rebuild_population(environment=environment)
