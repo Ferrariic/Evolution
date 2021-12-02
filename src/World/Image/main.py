@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 import random
 import time
+from PIL import Image
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+from numpy.core.defchararray import center
 
 class Build2D:
     def __init__(self, seed=(int(time.time())), shape=4, threshold=100, complexity=1, shift=1):
@@ -41,7 +45,6 @@ class Build2D:
             self.__build_square()
         return self.arr
     
-    
 class DrawGame:
     
     def __init__(self, window_width, window_height):
@@ -50,18 +53,38 @@ class DrawGame:
         self.main_screen = None
         self.object_positions = dict()
         self.mouse_position = None
+        self.time_seed = int(time.time())
         self.page = None
         
+    '''flushes window'''
     def __create_main_window(self):
         self.main_screen = np.zeros([self.window_height, self.window_width, 3], dtype=np.uint8)
         self.main_screen[:,:] = [0,0,0] # add main screen window here
         
-    def __create_square(self, height=None, width=None, color=[255,255,255]):
+    '''displays screen, converts BGR to RGB'''
+    def __display_screen(self):
+        self.main_screen = cv2.cvtColor(self.main_screen, cv2.COLOR_BGR2RGB)
+        cv2.imshow('Cataclysm-Evolution', self.main_screen)
+        cv2.waitKey(delay=1)
+        
+    """
+        Objects
+    """
+    def __create_square(self, height=None, width=None, cmap_color='bone', intensity=1):
         #BGR color scheme
-        square = np.zeros([height, width, 3], dtype=np.uint8)
-        square[:,:] = color
+        np.random.seed(self.time_seed) # prevents
+        square = np.random.rand(height,width)
+        cmap = cm.get_cmap(cmap_color, 20)
+        square = (cmap(square[:,:])*255)*intensity
+        square = square[:,:,0:3]
+        
+        square = square.astype(int)
+        square = square.astype(np.uint8)
         return square
         
+        """
+            Drawing an object
+        """
     def __draw_object(self, img, center_on=None, offset=None):
         if img.shape[0] > center_on.shape[0]:
             img = img[0:center_on.shape[0],:]
@@ -82,6 +105,7 @@ class DrawGame:
             (width_mid-img_wmid+w_off):(width_mid+img_wmid+w_off)
         ] = img
         
+    '''depr draw random 2d background and place, it's kind of ugly'''
     def __draw_background(self):
         background = Build2D(shape = 256, threshold = 200, complexity=2, shift=.9).build_2d_square()
         background = np.stack([background, background, background], axis=2)
@@ -91,40 +115,70 @@ class DrawGame:
         background = background.astype(np.uint8)
         return background
         
+    """
+        Pages        
+    """
+    '''Main Menu'''
     def __draw_main_menu(self):
+        self.__create_main_window() # Flushes screen
         # Background images
         
-        singleplayer_box = self.__create_square(height=56, width=400, color=[255,255,255])
-        multiplayer_box = self.__create_square(height=56, width=400, color=[255,255,255])
-        level_builder_box = self.__create_square(height=56, width=400, color=[255,255,255])
-        quit_box = self.__create_square(height=56, width=230, color=[255,255,255])
-        options_box = self.__create_square(height=56, width=230, color=[255,255,255])
-        music_box = self.__create_square(height=50, width=50, color=[255,255,255])
+        '''singleplayer box'''
+        singleplayer_box_background = self.__create_square(height=56, width=400,cmap_color='summer_r',intensity=.75)
+        singleplayer_box = self.__create_square(height=46, width=388, cmap_color='summer')
         
+        self.__draw_object(singleplayer_box_background, center_on=self.main_screen, offset=(-80,0))
         self.__draw_object(singleplayer_box, center_on=self.main_screen, offset=(-80,0))
-        self.__draw_object(multiplayer_box, center_on=self.main_screen, offset=(0,0))
-        self.__draw_object(level_builder_box, center_on=self.main_screen, offset=(80,0))
-        self.__draw_object(quit_box, center_on=self.main_screen, offset=(170,140))
-        self.__draw_object(options_box, center_on=self.main_screen, offset=(170,-140))
-        self.__draw_object(music_box, center_on=self.main_screen, offset=(250,400))
         
-    def __draw_options(self):
-        a_box = self.__create_square(height=56, width=400, color=[255,0,255])
-        self.__draw_object(a_box, center_on=self.main_screen, offset=(-80,0))
+        '''multiplayer box'''
+        multiplayer_box_background = self.__create_square(height=56, width=400,cmap_color='inferno_r',intensity=.75)
+        multiplayer_box = self.__create_square(height=46, width=388,cmap_color='inferno')
+        
+        self.__draw_object(multiplayer_box_background, center_on=self.main_screen, offset=(0,0))
+        self.__draw_object(multiplayer_box, center_on=self.main_screen, offset=(0,0))
+        
+        '''level builder box'''
+        levelbuilder_box_background = self.__create_square(height=56, width=400,cmap_color='winter_r',intensity=.75)
+        levelbuilder_box = self.__create_square(height=46, width=388,cmap_color='winter')
+        
+        self.__draw_object(levelbuilder_box_background, center_on=self.main_screen, offset=(80,0))
+        self.__draw_object(levelbuilder_box, center_on=self.main_screen, offset=(80,0))
+        
+        '''quit box'''
+        quit_box_background = self.__create_square(height=56, width=230,cmap_color='bone_r',intensity=.75)
+        quit_box = self.__create_square(height=46, width=218,cmap_color='bone')
+        
+        self.__draw_object(quit_box_background, center_on=self.main_screen, offset=(170,140))
+        self.__draw_object(quit_box, center_on=self.main_screen, offset=(170,140))
+        
+        '''options box'''
+        options_box_background = self.__create_square(height=56, width=230,cmap_color='spring_r',intensity=.75)
+        options_box = self.__create_square(height=46, width=218,cmap_color='spring')
+        
+        self.__draw_object(options_box_background, center_on=self.main_screen, offset=(170,-140))
+        self.__draw_object(options_box, center_on=self.main_screen, offset=(170,-140))
+        
+        '''music box'''
+        music_box_background = self.__create_square(height=50, width=50,cmap_color='ocean_r',intensity=.75)
+        music_box = self.__create_square(height=38, width=38,cmap_color='ocean')
+        
+        self.__draw_object(music_box_background, center_on=self.main_screen, offset=(250,400))
+        self.__draw_object(music_box, center_on=self.main_screen, offset=(250,400))
     
+    '''detects mouse events'''
     def detect_Mouse(self, event,x,y,flags,param):
         self.mouse_position = None
-        if event == cv2.EVENT_LBUTTONDBLCLK:
+        if (event == cv2.EVENT_LBUTTONDOWN) or (event == cv2.EVENT_LBUTTONDBLCLK):
             self.mouse_position = [x,y]
-            print(self.mouse_position)
 
     def play(self):
         cv2.namedWindow('Cataclysm-Evolution')
         cv2.setMouseCallback('Cataclysm-Evolution', self.detect_Mouse)
+        page = 'Main_menu'
         while True:
-            self.__create_main_window()
-            self.__draw_main_menu()
-            cv2.imshow('Cataclysm-Evolution', self.main_screen)
-            cv2.waitKey(delay=1)
+            if page =='Main_menu':
+                self.__draw_main_menu()
+                #print(self.mouse_position)
+            self.__display_screen()
         
 DrawGame(window_height=600, window_width=900).play()
