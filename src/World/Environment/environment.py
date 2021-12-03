@@ -19,6 +19,9 @@ class Environment:
             'upl':[],
             'dnr':[],
             'dnl':[],
+            'random':[],
+            'forward':[],
+            'reverse':[],
             'environment_json':self.environment_json
         }
         return environment

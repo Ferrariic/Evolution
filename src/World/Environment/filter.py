@@ -36,6 +36,6 @@ class Filter:
     
     def filter_population(self):
         self.__filter_RIGHT()
-        self.__filter_DOWN()
+        self.__filter_UP()
         print(f'Remaining Entities after filtering: {len(self.entities)}')
         return self.entities

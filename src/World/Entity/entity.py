@@ -242,7 +242,7 @@ class Entity:
             
             '''output neurons'''
             # Establish motor neurons and their outputs
-            MOVEMENT_OUTPUTS = ['UP','DN','L','R','UPR','UPL','DNR','DNL','RANDOM','REVERSE','HALT']
+            MOVEMENT_OUTPUTS = ['UP','DN','L','R','UPR','UPL','DNR','DNL','RANDOM','REVERSE','FORWARD','HALT']
             DIRECTION_VELOCITY_OUTPUTS = ['DIR_RIGHT','DIR_LEFT','DIR_REVERSE','VEL_REDUCE','VEL_INCREASE']
             INTERACTION_OUTPUTS = ['ATTACK','SHARE_FOOD','HEAL_OTHER','HUNT']
             INDIVIDUAL_OUTPUTS = ['REST']

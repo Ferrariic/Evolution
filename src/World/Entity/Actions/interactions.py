@@ -45,6 +45,7 @@ def interact_ATTACK(environment, entity):
     if not (entity.energy > 5):
         return
     # Logic for interaction
+    environment['attack_interactions'] = environment['attack_interactions'] + [entity.position, interaction_target['position']]
     entity.energy -= 5
     interaction_target['health'] -= entity.strength*entity.size
     print(f"{entity.name} -ATTACKED-> {interaction_target['name']}")
@@ -54,7 +55,6 @@ def interact_ATTACK(environment, entity):
         entity.food += (interaction_target['food'] + interaction_target['health']*interaction_target['size']) # takes their food
     
     # Update environment
-    environment['attack_interactions'] = environment['attack_interactions'] + [entity.position, interaction_target['position']]
     update_environment(environment, entity, interaction_target)
 
 def interact_MATE(environment, entity):
@@ -66,6 +66,7 @@ def interact_MATE(environment, entity):
     if not ((entity.energy > 10) & (interaction_target['energy']>10)):
         return
     
+    environment['mate_interactions'] = environment['mate_interactions'] + [entity.position, interaction_target['position']]
     entity.energy -= 10
     entity.children += 1
     
@@ -80,7 +81,6 @@ def interact_MATE(environment, entity):
     print(f'{parent_name} -MATED-> {entity.name} | CHILD: {child_name}')
     
     update_environment(environment, entity, interaction_target) # Update parents to field
-    environment['mate_interactions'] = environment['mate_interactions'] + [entity.position, interaction_target['position']]
     environment['environment_json'].append(new_entity)
     
 def interact_SHARE_FOOD(environment, entity):
@@ -95,7 +95,6 @@ def interact_SHARE_FOOD(environment, entity):
     entity.food -= 10
     entity.liked += 10
     interaction_target['food'] += 10
-    
     print(f"{entity.name} -SHARING FOOD-> {interaction_target['name']}")
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
 
@@ -107,11 +106,11 @@ def interact_HEAL_OTHER(environment, entity):
         return
     if not (entity.energy > 5):
         return
+    environment['healing_interactions'] = environment['healing_interactions'] + [entity.position, interaction_target['position']]
     entity.energy -= 5
     entity.food -= 2
     interaction_target['health'] += 20
     print(f"{entity.name} -HEALING-> {interaction_target['name']}")
-    environment['healing_interactions'] = environment['healing_interactions'] + [entity.position, interaction_target['position']]
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
     
 def interact_HUNT(environment, entity):
@@ -126,7 +125,7 @@ def interact_HUNT(environment, entity):
     entity.position = interaction_target['position'] # sets position of entity on top of target
     interaction_target['health'] = 0 # kills target
     interaction_target['is_Alive'] = False # kills target
-    interaction_target['cause_of_death'] = 'Hunted' #cod hunted
+    interaction_target['cause_of_death'] = 'Hunted' #cod huntedw
     entity.food += (interaction_target['food'] + interaction_target['health']*interaction_target['size']) # takes their food and some
     print(f"{entity.name} -HUNTED-> {interaction_target['name']}")
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
