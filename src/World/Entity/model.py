@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class Model:
     """
@@ -9,9 +10,14 @@ class Model:
         self.input_neurons = input_neurons
         self.inner_neurons = inner_neurons
         self.output_neurons = output_neurons
-        
-    def __sigmoid(self, x):
-        return 1 / (1 + math.exp(-x))
+    
+    def __activation(self, x, choice=1):
+        'relu'
+        if choice == 1:
+            return np.maximum(x, 0)
+        'sigmoid'
+        if choice == 2:
+            return 1 / (1 + math.exp(-x))
     
     def compile_and_run(self):
         # Solve hidden layers first
@@ -46,7 +52,7 @@ class Model:
         hidden_neuron_values = dict()
         for key, value in hidden_neuron_computation.items():
             try:
-                hidden_neuron_values[key] = self.__sigmoid(value)
+                hidden_neuron_values[key] = self.__activation(value)
             except:
                 pass
         
@@ -83,7 +89,7 @@ class Model:
         output_values = dict()
         for key, value in output_neuron_computation.items():
             try:
-                output_values[key] = self.__sigmoid(value)
+                output_values[key] = self.__activation(value)
             except:
                 pass
         try:

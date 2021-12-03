@@ -39,7 +39,7 @@ class Status:
         return True
     
     def __check_can_mate(self):
-        age_lower_bound_check = (self.age > 10)
+        age_lower_bound_check = (self.age > 20)
         food_check = (self.food > 0)
         energy_check = (self.energy > 0)
         
@@ -81,7 +81,7 @@ class Status:
             
         ### Optional world bounds
         # works for square worlds
-        world_wrap=True
+        world_wrap=False
         wrap = 1
         if world_wrap:
             wrap = -1

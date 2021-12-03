@@ -11,7 +11,7 @@ def individual_REST(environment, entity):
     update_environment(environment, entity)
     
 def individual_SELF_REPLICATE(environment, entity):
-    if not ((entity.energy >= 100)&(not entity.is_Male)&(entity.can_mate)):
+    if not ((entity.energy >= 110)&(not entity.is_Male)&(entity.can_mate)):
         return
     entity.energy -= 140
     entity.children += 1

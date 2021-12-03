@@ -212,27 +212,37 @@ class Entity:
             """
             sensor = Sensors(entity=self.Entity, environment=self.environment)
             x_proximity, y_proximity = sensor.proximity_to_neighbor_XY()
+            x_density, y_density = sensor.population_XY()
+            x_distance_mate, y_distance_mate = sensor.proximity_to_mate_XY()
+            
             '''sensory neurons'''
             self.input_neurons = {
-            # Self identifiers (sensory neurons)
-            '0' : sensor.velocity(),
-            '1' : sensor.direction(),
-            '2' : sensor.age(),
-            '3' : sensor.size(),
-            '4' : sensor.strength(), # strength
-            '5' : sensor.health(), # health; constitution
-            '6' : sensor.children(), # children
-            '7' : sensor.food(), # food available
-            '8' : sensor.liked(), # are they liked or not
-            '9' : sensor.energy(), # how much energy do they have
-            '10' : sensor.starving(), # are they starving
-            '11' : sensor.mate(), # are they able to mate
+            # Self identifiers
+            '0' : sensor.velocity(), # velocity of subject
+            '1' : sensor.current_velocity(), # current velocity of subject
+            '2' : sensor.direction(), # direction of subject motion
+            '3' : sensor.age(), # age of subject
+            '4' : sensor.size(), # size of subject
+            '5' : sensor.strength(), # strength
+            '6' : sensor.health(), # health; constitution
+            '7' : sensor.children(), # children
+            '8' : sensor.food(), # food available
+            '9' : sensor.liked(), # are they liked or not
+            '10' : sensor.energy(), # how much energy do they have
+            '11' : sensor.starving(), # are they starving
+            '12' : sensor.mate(), # are they able to mate
             
             # random neurons and sensory mutations
-            '12' : random.random(), # random values
-            '13' : x_proximity, # proximity to neighbor
-            '14' : y_proximity, ## proximity to neighbor
-            '15' : sensor.direction_to_neighbor(),
+            '13' : random.random(), # random values
+            
+            # Population identifiers
+            '14' : x_proximity, # proximity to neighbor
+            '15' : y_proximity, ## proximity to neighbor
+            '16' : sensor.direction_to_neighbor(),
+            '17' : x_density, # density in x direction
+            '18' : y_density, # density in y direction
+            '19' : x_distance_mate, # x distance to mate
+            '20' : y_distance_mate, # y distance to mate
             }
 
             '''inner neurons'''

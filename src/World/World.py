@@ -6,16 +6,16 @@ from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 import json
 
-starting_population = 20
-lower_bound_threshold = int(starting_population/2)
+starting_population = 1000
+lower_bound_threshold = int(starting_population/3)
 
-step_years = 1000
+step_years = 10000
 generation_cycles = 10000
-world_size=[[-256, 256],[-256, 256]] # 128, 128
+genome_length = 2
+world_size=[[-256, 256],[-256, 256]]
 
 actions=True # See entity actions
 load_latest=False # New file
-
 
 if __name__ == '__main__':
     draw = DrawImage(world_size=world_size)
@@ -24,7 +24,7 @@ if __name__ == '__main__':
         environment = json.load(open('src\World\Data\data.json'))
         entities = Entity.update_entity_values(environment=environment, world_size=world_size)
     else: # Otherwise, builds new entity object list
-        entities = [Entity(genome_length=10) for entity in range(starting_population)]
+        entities = [Entity(genome_length=genome_length) for entity in range(starting_population)]
         
     for generation in range(generation_cycles):
         for year in range(step_years):
@@ -45,6 +45,7 @@ if __name__ == '__main__':
         
         '''Optional filter'''
         #entities = Filter(entities=entities).filter_population()
+        
         '''Generation statistics'''
         Generation(entities=entities, population_limit=starting_population).statistics()
         '''Rebuilding the population after each generation based upon the survivors.'''
