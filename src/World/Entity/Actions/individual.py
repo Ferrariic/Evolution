@@ -7,14 +7,13 @@ def update_environment(environment, entity):
     environment['environment_json'][name_position] = entity.export_entity_values()
 
 def individual_REST(environment, entity):
-    entity.energy += 10
-    entity.food += 1
+    entity.food += 0.05
     update_environment(environment, entity)
     
 def individual_SELF_REPLICATE(environment, entity):
-    if not ((entity.energy > 100)&(not entity.is_Male)&(entity.can_mate)):
+    if not ((entity.energy >= 150)&(not entity.is_Male)&(entity.can_mate)):
         return
-    entity.energy -= 100
+    entity.energy -= 150
     entity.children += 1
     
     '''builds child'''

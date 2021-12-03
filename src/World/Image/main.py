@@ -107,12 +107,13 @@ class DrawGame:
         
     '''depr draw random 2d background and place, it's kind of ugly'''
     def __draw_background(self):
-        background = Build2D(shape = 256, threshold = 200, complexity=2, shift=.9).build_2d_square()
+        background = Build2D(shape = 256, threshold = 0, complexity=1, shift=.9).build_2d_square()
         background = np.stack([background, background, background], axis=2)
         channel_choice=0
         background[:,:,channel_choice] = background[:,:,channel_choice]/2
         background = background.astype(int)
         background = background.astype(np.uint8)
+        background = cv2.resize(background, (900,600))
         return background
         
     """
@@ -121,6 +122,7 @@ class DrawGame:
     '''Main Menu'''
     def __draw_main_menu(self):
         self.__create_main_window() # Flushes screen
+        
         # Background images
         
         '''singleplayer box'''

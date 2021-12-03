@@ -11,16 +11,16 @@ class DrawImage:
     def __process_world_coordinates(self, environment):
         self.environment = environment
         locations = self.environment['all_entity_locations']
-        colors = self.environment['all_entity_colors']
+        images = self.environment['all_entity_images']
         sizes = self.environment['all_entity_sizes']
         
-        zipped = list(zip(locations, colors, sizes))
+        zipped = list(zip(locations, images, sizes))
         
         self.world_information = []
-        for coords, color, size in zipped:
+        for coords, images, size in zipped:
             x = coords[0] + self.world_size[0][1]
             y = coords[1] + self.world_size[1][1]
-            self.world_information.append([x, y, color, size])
+            self.world_information.append([x, y, images, size])
 
             
     def draw_environment(self, environment):
@@ -30,7 +30,11 @@ class DrawImage:
         world = np.zeros([x_max+5, y_max+5, 3], dtype=np.uint8)
         world[:,:] = [0,0,0]
         
-        for x, y, color, size in self.world_information:
-            world[x:x+size,y:y+size] = color
-        cv2.imshow('world', world)
+        for x, y, image, size in self.world_information:
+            image = np.array(image)
+            try:
+                world[x:x+image.shape[0],y:y+image.shape[1]] = image
+            except:
+                pass
+        cv2.imshow('Cataclysm-Evolution', world)
         cv2.waitKey(delay=1)

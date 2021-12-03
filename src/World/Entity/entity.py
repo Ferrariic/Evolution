@@ -36,13 +36,13 @@ class Entity:
         self.velocity = assign_velocity_HEX2INT(self.genome)
         self.is_Male = assign_male_HEX2BOOL(self.genome)
         self.will_Flee = assign_flee_HEX2BOOL(self.genome)
-        self.color = assign_color_HEX2TRIPLE255(self.genome)
+        self.image = assign_image_8X8(self.genome)
         self.size = assign_size_HEX2INT7(self.genome)
         self.strength = assign_strength_HEX2INT63(self.genome)
         self.health = assign_health_HEX2INT127(self.genome)
         
         '''world properties'''
-        self.position = [random.randint(-64,64),random.randint(-64,64)]
+        self.position = [random.randint(-256,256),random.randint(-256,256)]
         self.direction = random.randint(0,359)
         self.current_velocity = self.velocity
         
@@ -76,7 +76,7 @@ class Entity:
             self.strength = self.properties['strength']
             self.health = self.properties['health']
             self.children = self.properties['children']
-            self.color = self.properties['color']
+            self.image = self.properties['image']
             self.food = self.properties['food']
             self.is_starving = self.properties['is_starving']
             self.liked = self.properties['liked']
@@ -103,7 +103,7 @@ class Entity:
             'strength':self.strength,
             'health':self.health,
             'children':self.children,
-            'color':self.color,
+            'image':self.image,
             'food':self.food,
             'is_starving':self.is_starving,
             'liked':self.liked,

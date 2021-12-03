@@ -11,7 +11,7 @@ def generate_genome_RAND2HEX(length_genome=10):
 def decode_genome_HEX2BIN(genome, mutate=True):
     bingenome = [bin(int(hexgene,16))[2:].zfill(32) for hexgene in genome.split(' ')]
     if mutate:
-        bingenome = textwrap.wrap(''.join([str(1-int(bit)) if (random.randint(1, 64)==1) else bit for gene in bingenome for bit in gene]), 32)
+        bingenome = textwrap.wrap(''.join([str(1-int(bit)) if (random.randint(1, 128)==1) else bit for gene in bingenome for bit in gene]), 32)
     return bingenome
 
 '''encoding from bin to hex'''
@@ -105,6 +105,14 @@ def assign_color_HEX2TRIPLE255(genome):
     color2 = int(decode_genome_HEX2BIN(genome, mutate=False)[0][8:16],2)
     color3 = int(decode_genome_HEX2BIN(genome, mutate=False)[0][16:24],2)
     return [color1, color2, color3]
+
+def assign_image_8X8(genome):
+    half_img = np.asarray([1 if value == '1' else 0 for value in decode_genome_HEX2BIN(genome, mutate=False)[0]])
+    half_img = np.stack([half_img, half_img, half_img],axis=1)
+    half_img = half_img.reshape(-1,4,3)*255
+    sprite = np.concatenate((half_img, np.fliplr(half_img)), axis=1)
+    sprite = np.where(sprite>1, assign_color_HEX2TRIPLE255(genome), [0,0,0])
+    return sprite.tolist()
 """
     Entity Creation for Crossover
 """
@@ -118,7 +126,7 @@ def mate_parents_OBJ_DICT(entity, interaction_target):
     new_entity['health'] = assign_health_HEX2INT127(new_entity['genome'])
     new_entity['is_Male'] = assign_male_HEX2BOOL(new_entity['genome'])
     new_entity['size'] = assign_size_HEX2INT7(new_entity['genome'])
-    new_entity['color'] = assign_color_HEX2TRIPLE255(new_entity['genome'])
+    new_entity['image'] = assign_image_8X8(new_entity['genome'])
     new_entity['velocity'] = assign_velocity_HEX2INT(new_entity['genome'])
     new_entity['current_velocity'] = new_entity['velocity'] 
     new_entity['will_Flee'] = assign_flee_HEX2BOOL(new_entity['genome'])
@@ -134,7 +142,7 @@ def mate_parents_OBJ_DICT(entity, interaction_target):
     new_entity['is_starving'] = False
     new_entity['job_tasks'] = 0
     new_entity['inventory'] = []
-    new_entity['position'] = [random.randint(-64,64),random.randint(-64,64)]
+    new_entity['position'] = entity.position
     new_entity['generation'] = int(max([entity.generation,interaction_target['generation']])+1)
     new_entity['cause_of_death'] = None
     return new_entity
@@ -150,7 +158,7 @@ def mate_parents_OBJ_OBJ(entity1, entity2):
     new_entity['size'] = assign_size_HEX2INT7(new_entity['genome'])
     new_entity['strength'] = assign_strength_HEX2INT63(new_entity['genome'])
     new_entity['health'] = assign_health_HEX2INT127(new_entity['genome'])
-    new_entity['color'] = assign_color_HEX2TRIPLE255(new_entity['genome'])
+    new_entity['image'] = assign_image_8X8(new_entity['genome'])
     new_entity['is_Male'] = assign_male_HEX2BOOL(new_entity['genome'])
     new_entity['current_velocity'] = new_entity['velocity'] 
     new_entity['food'] = 100
@@ -165,7 +173,7 @@ def mate_parents_OBJ_OBJ(entity1, entity2):
     new_entity['is_starving'] = False
     new_entity['liked'] = 0
     new_entity['inventory'] = []
-    new_entity['position'] = [random.randint(-64,64),random.randint(-64,64)]
+    new_entity['position'] = [random.randint(-256,256),random.randint(-256,256)]
 
     new_entity['cause_of_death'] = None
     return new_entity

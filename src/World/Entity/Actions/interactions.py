@@ -112,14 +112,14 @@ def interact_HEAL_OTHER(environment, entity):
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
     
 def interact_HUNT(environment, entity):
-    interaction_target = closest_node(environment, entity, distance_threshold=10)
+    interaction_target = closest_node(environment, entity, distance_threshold=30)
     if interaction_target is None:
         return
     if not interaction_target['is_Alive']:
         return
     if not (entity.energy > 5):
         return
-    entity.energy = 200 #resets energy to full 
+    entity.energy -= 5
     entity.position = interaction_target['position'] # sets position of entity on top of target
     interaction_target['health'] = 0 # kills target
     interaction_target['is_Alive'] = False # kills target
