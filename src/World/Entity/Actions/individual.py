@@ -22,4 +22,5 @@ def individual_SELF_REPLICATE(environment, entity):
     print(f'{entity.name} -SELF-REPLICATE-> {entity.name} | CHILD: {child_name}')
     
     update_environment(environment, entity) 
+    environment['mate_interactions'] = environment['mate_interactions'] + [entity.position]
     environment['environment_json'].append(new_entity)

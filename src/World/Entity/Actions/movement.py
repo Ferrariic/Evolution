@@ -20,73 +20,81 @@ def update_environment(environment, entity):
 def move_UP(environment, entity):
     entity.energy -= 1
     vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
-    goal = [int(x), int(y+vel)]
-    if is_occupied(environment=environment, goal=goal):
-        return
-    entity.position = goal
-    update_environment(environment=environment, entity=entity)
-    
-def move_DN(environment, entity):
-    entity.energy -= 1
-    vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
-    goal = [int(x), int(y-vel)]
-    if is_occupied(environment=environment, goal=goal):
-        return
-    entity.position = goal
-    update_environment(environment=environment, entity=entity)
-    
-def move_L(environment, entity):
-    entity.energy -= 1
-    vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
     goal = [int(x-vel), int(y)]
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    environment['up'] = environment['up'] + [entity.position]
     update_environment(environment=environment, entity=entity)
-
-def move_R(environment, entity):
+    
+def move_DN(environment, entity):
     entity.energy -= 1
     vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
     goal = [int(x+vel), int(y)]
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    environment['dn'] = environment['dn'] + [entity.position]
     update_environment(environment=environment, entity=entity)
-
-def move_UPR(environment, entity):
+    
+def move_L(environment, entity):
     entity.energy -= 1
     vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
-    goal = [int(x+vel), int(y+vel)]
+    goal = [int(x), int(y-vel)]
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    environment['l'] = environment['l'] + [entity.position]
     update_environment(environment=environment, entity=entity)
-    
-def move_UPL(environment, entity):
+
+def move_R(environment, entity):
+    entity.energy -= 1
+    vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
+    goal = [int(x), int(y+vel)]
+    if is_occupied(environment=environment, goal=goal):
+        return
+    entity.position = goal
+    environment['r'] = [entity.position]
+    update_environment(environment=environment, entity=entity)
+
+def move_UPR(environment, entity):
     entity.energy -= 1
     vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
     goal = [int(x-vel), int(y+vel)]
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    environment['upr'] = environment['upr'] + [entity.position]
     update_environment(environment=environment, entity=entity)
     
-def move_DNR(environment, entity):
-    entity.energy -= 1
-    vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
-    goal = [int(x+vel), int(y-vel)]
-    if is_occupied(environment=environment, goal=goal):
-        return
-    entity.position = goal
-    update_environment(environment=environment, entity=entity)
-    
-def move_DNL(environment, entity):
+def move_UPL(environment, entity):
     entity.energy -= 1
     vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
     goal = [int(x-vel), int(y-vel)]
     if is_occupied(environment=environment, goal=goal):
         return
     entity.position = goal
+    environment['upl'] = environment['upl'] + [entity.position]
+    update_environment(environment=environment, entity=entity)
+    
+def move_DNR(environment, entity):
+    entity.energy -= 1
+    vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
+    goal = [int(x+vel), int(y+vel)]
+    if is_occupied(environment=environment, goal=goal):
+        return
+    entity.position = goal
+    environment['dnr'] = environment['dnr'] + [entity.position]
+    update_environment(environment=environment, entity=entity)
+    
+def move_DNL(environment, entity):
+    entity.energy -= 1
+    vel, x, y = entity.current_velocity, entity.position[0], entity.position[1]
+    goal = [int(x+vel), int(y-vel)]
+    if is_occupied(environment=environment, goal=goal):
+        return
+    entity.position = goal
+    environment['dnl'] = environment['dnl'] + [entity.position]
     update_environment(environment=environment, entity=entity)
 
 def move_RANDOM(environment, entity):

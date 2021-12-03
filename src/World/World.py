@@ -5,7 +5,7 @@ from Environment.rebuild_generation import Generation
 from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 
-starting_population = 500
+starting_population = 100
 lower_bound_threshold = int(starting_population/3)
 step_years = 300
 generation_cycles = 10000
@@ -13,18 +13,19 @@ world_size=[[-256, 256],[-256, 256]] # 128, 128
 
 if __name__ == '__main__':
     draw = DrawImage(world_size=world_size)
-    entities = [Entity(genome_length=4) for entity in range(starting_population)]
+    entities = [Entity(genome_length=100) for entity in range(starting_population)]
     if __name__ == '__main__':
         for generation in range(generation_cycles):
             for year in range(step_years):
                 environment = Environment(environment_json=[entity.export_entity_values() for entity in entities]).export_environment_variables()
-                draw.draw_environment(environment=environment)
+                [entity.next(environment) for entity in entities] # entities do actions
+                draw.draw_environment(environment=environment,generation=generation, year=year)
+                
                 if len(environment['environment_json']) <= lower_bound_threshold:
                     population = len(environment['environment_json'])
                     print(f"----------------------{generation=}---{year=}---{population=}----------------------")
                     break
                 
-                [entity.next(environment) for entity in entities] # entities do actions
                 entities = Entity.update_entity_values(environment=environment, world_size=world_size) # update environment entities
             
             population = len(environment['environment_json'])

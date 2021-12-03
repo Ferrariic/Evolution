@@ -54,6 +54,7 @@ def interact_ATTACK(environment, entity):
         entity.food += (interaction_target['food'] + interaction_target['health']*interaction_target['size']) # takes their food
     
     # Update environment
+    environment['attack_interactions'] = environment['attack_interactions'] + [entity.position, interaction_target['position']]
     update_environment(environment, entity, interaction_target)
 
 def interact_MATE(environment, entity):
@@ -79,6 +80,7 @@ def interact_MATE(environment, entity):
     print(f'{parent_name} -MATED-> {entity.name} | CHILD: {child_name}')
     
     update_environment(environment, entity, interaction_target) # Update parents to field
+    environment['mate_interactions'] = environment['mate_interactions'] + [entity.position, interaction_target['position']]
     environment['environment_json'].append(new_entity)
     
 def interact_SHARE_FOOD(environment, entity):
@@ -109,13 +111,14 @@ def interact_HEAL_OTHER(environment, entity):
     entity.food -= 2
     interaction_target['health'] += 20
     print(f"{entity.name} -HEALING-> {interaction_target['name']}")
+    environment['healing_interactions'] = environment['healing_interactions'] + [entity.position, interaction_target['position']]
     update_environment(environment=environment, entity=entity, interaction_target=interaction_target)
     
 def interact_HUNT(environment, entity):
-    interaction_target = closest_node(environment, entity, distance_threshold=30)
+    interaction_target = closest_node(environment, entity, distance_threshold=20)
     if interaction_target is None:
         return
-    if not interaction_target['is_Alive']:
+    if not (interaction_target['is_Alive'] & (interaction_target['name'] == entity.name)):
         return
     if not (entity.energy > 5):
         return
