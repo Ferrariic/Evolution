@@ -1,4 +1,3 @@
-import collections
 import random
 from Entity.genetics import *
 from Entity.entity import Entity
@@ -17,7 +16,12 @@ class Generation:
                 entity1, entity2 = random.choices(self.entities, k=2)
             except:
                 print("Population could not be rebuilt.")
-            new_ent_dict = mate_parents_OBJ_OBJ(entity1=entity1, entity2=entity2)
+            try:
+                new_ent_dict = mate_parents_OBJ_OBJ(entity1=entity1, entity2=entity2)
+            except UnboundLocalError:
+                print("Simulation Complete.")
+                return
+                
             entity_list.append(Entity(properties=new_ent_dict))
             
         with open("src/World/Data/data.json", 'w') as f:
@@ -25,8 +29,7 @@ class Generation:
         return entity_list
         
     def statistics(self):
-        genetic_pool = [entity.genome for entity in self.entities]
-        gene_lists = [genome.split(' ') for genome in genetic_pool]
+        gene_lists= [entity.genome.split(' ') for entity in self.entities]
         genes = [gene for entity_genes in gene_lists for gene in entity_genes]
         Unique_genes = len(set(genes))
         print(f'{Unique_genes=}')

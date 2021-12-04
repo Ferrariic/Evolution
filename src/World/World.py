@@ -6,10 +6,10 @@ from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 import json
 
-starting_population = 1000
-lower_bound_threshold = int(starting_population/3)
+starting_population = 50
+lower_bound_threshold = int(starting_population/1.5)
 
-step_years = 10000
+step_years = 300
 generation_cycles = 10000
 genome_length = 2
 world_size=[[-256, 256],[-256, 256]]

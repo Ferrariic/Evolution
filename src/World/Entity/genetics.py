@@ -130,7 +130,7 @@ def mate_parents_OBJ_DICT(entity, interaction_target):
     new_entity['velocity'] = assign_velocity_HEX2INT(new_entity['genome'])
     new_entity['current_velocity'] = new_entity['velocity'] 
     new_entity['will_Flee'] = assign_flee_HEX2BOOL(new_entity['genome'])
-    new_entity['food'] = 100
+    new_entity['food'] = random.randint(80,100)
     new_entity['children'] = 0
     new_entity['direction'] = random.randint(0,359)
     new_entity['is_Alive'] = True
@@ -161,7 +161,7 @@ def mate_parents_OBJ_OBJ(entity1, entity2):
     new_entity['image'] = assign_image_8X8(new_entity['genome'])
     new_entity['is_Male'] = assign_male_HEX2BOOL(new_entity['genome'])
     new_entity['current_velocity'] = new_entity['velocity'] 
-    new_entity['food'] = 100
+    new_entity['food'] = random.randint(80,100)
     new_entity['generation'] = int(max([entity1.generation, entity2.generation])+1)
     new_entity['children'] = 0
     new_entity['direction'] = random.randint(0,359)

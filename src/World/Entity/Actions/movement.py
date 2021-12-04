@@ -134,6 +134,7 @@ def move_REVERSE(environment, entity):
     update_environment(environment=environment, entity=entity)
     
 def move_HALT(environment, entity):
+    environment['halt'] = environment['halt'] + [entity.position]
     x, y = entity.position[0], entity.position[1]
     goal = [int(x), int(y)]
     if is_occupied(environment=environment, goal=goal):

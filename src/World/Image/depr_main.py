@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
-import random
 import time
-from PIL import Image
 from matplotlib import cm
 from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from numpy.core.defchararray import center

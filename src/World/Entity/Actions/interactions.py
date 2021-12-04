@@ -1,9 +1,6 @@
-import math
 from os import environ
 from scipy.spatial import distance
 from Entity.genetics import *
-import string
-import random
 
 """
     Interaction backup functions
@@ -11,6 +8,7 @@ import random
 def closest_node(environment, entity, distance_threshold=8):
     nodes = environment['all_entity_locations'][:]
     node = entity.position
+    
     nodes.remove(node)
     
     closest_node = nodes[distance.cdist([node], nodes).argmin()]
@@ -121,6 +119,8 @@ def interact_HUNT(environment, entity):
         return
     if not (entity.energy > 5):
         return
+    
+    environment['hunt'] = environment['hunt'] + [entity.position, interaction_target['position']]
     entity.energy -= 5
     entity.position = interaction_target['position'] # sets position of entity on top of target
     interaction_target['health'] = 0 # kills target

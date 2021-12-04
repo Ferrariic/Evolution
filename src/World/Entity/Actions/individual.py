@@ -7,7 +7,8 @@ def update_environment(environment, entity):
     environment['environment_json'][name_position] = entity.export_entity_values()
 
 def individual_REST(environment, entity):
-    entity.food += 0.05
+    environment['plant'] = environment['plant'] + [entity.position]
+    entity.food += 0.1
     update_environment(environment, entity)
     
 def individual_SELF_REPLICATE(environment, entity):

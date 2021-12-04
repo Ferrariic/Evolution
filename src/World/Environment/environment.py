@@ -26,6 +26,10 @@ class Environment:
             'random':[],
             'forward':[],
             'reverse':[],
+            'plant':[],
+            'halt':[],
+            'hunt':[],
+            'changing_values':[],
             
             'environment_json':self.environment_json,
         }
