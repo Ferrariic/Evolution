@@ -81,7 +81,7 @@ class Status:
             
         ### Optional world bounds
         # works for square worlds
-        world_wrap=False
+        world_wrap=True
         wrap = 1
         if world_wrap:
             wrap = -1

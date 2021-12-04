@@ -247,14 +247,14 @@ class Entity:
 
             '''inner neurons'''
             # Establish inner neurons and their goals
-            INNER_NEURONS = 1
+            INNER_NEURONS = 10
             self.inner_neurons = {str(key):0 for key in range(INNER_NEURONS)}
             
             '''output neurons'''
             # Establish motor neurons and their outputs
             MOVEMENT_OUTPUTS = ['UP','DN','L','R','UPR','UPL','DNR','DNL','RANDOM','REVERSE','FORWARD','HALT']
             DIRECTION_VELOCITY_OUTPUTS = ['DIR_RIGHT','DIR_LEFT','DIR_REVERSE','VEL_REDUCE','VEL_INCREASE']
-            INTERACTION_OUTPUTS = ['ATTACK','HUNT'] #'SHARE_FOOD','HEAL_OTHER',
+            INTERACTION_OUTPUTS = ['ATTACK','HUNT','SHARE_FOOD','HEAL_OTHER',]
             INDIVIDUAL_OUTPUTS = ['REST']
             MATE_OUTPUTS = ['MATE','SELF_REPLICATE']
 

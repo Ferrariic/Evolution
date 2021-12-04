@@ -8,6 +8,7 @@ class MouseEvents:
         self.environment = environment
         self.world = world
         self.world_size = world_size
+        self.entity = None
         
     def __draw_mouse_box(self):
         img = np.array([[1,1,1,1,1,1],
@@ -60,7 +61,7 @@ class MouseEvents:
         '''finding closest entity to cursor'''
         closest_node = nodes[distance.cdist([node], nodes).argmin()]
         closest_node_index = self.environment['all_entity_locations'].index(closest_node)
-        entity = self.environment['environment_json'][closest_node_index]
+        self.entity = self.environment['environment_json'][closest_node_index]
         
         '''drawing to screen'''
         x1, y1 = closest_node
@@ -69,20 +70,20 @@ class MouseEvents:
         try:
             bounding_box = self.__draw_entity_bounding_box()
             bounding_box.astype('uint8')
-            world_range = self.world[world_x-10:world_x,world_y-5:world_y+5]
+            world_range = self.world[world_x-11:world_x-1,world_y-5:world_y+5]
             world_overlay = np.where(bounding_box>0, bounding_box, world_range)
             self.world[world_x-8:world_x+2,world_y-5:world_y+5] = world_overlay
         except:
             pass
         
-        name = entity['name']
-        genome_length = len(entity['genome'].split(' '))
-        genome_header = entity['genome'].split(' ')[0]
-        health = int(entity['health'])
-        food = int(entity['food'])
-        strength = int(entity['strength'])
-        age = int(entity['age'])
-        energy = int(entity['energy'])
+        name = self.entity['name']
+        genome_length = len(self.entity['genome'].split(' '))
+        genome_header = self.entity['genome'].split(' ')[0]
+        health = int(self.entity['health'])
+        food = int(self.entity['food'])
+        strength = int(self.entity['strength'])
+        age = int(self.entity['age'])
+        energy = int(self.entity['energy'])
         
         text = f'{name} {genome_header} H:{health} A:{age} S:{strength} E:{energy} F:{food} G:{genome_length}'
         try:
@@ -95,5 +96,3 @@ class MouseEvents:
         self.__mark_mouse_position()
         self.__draw_box_around_closest_entity()
         return self.world
-    
-    

@@ -8,13 +8,14 @@ def update_environment(environment, entity):
 
 def individual_REST(environment, entity):
     environment['plant'] = environment['plant'] + [entity.position]
-    entity.food += 0.1
+    entity.food += 2
     update_environment(environment, entity)
     
 def individual_SELF_REPLICATE(environment, entity):
-    if not ((entity.energy >= 110)&(not entity.is_Male)&(entity.can_mate)):
+    if not ((entity.food >= 150)&(entity.energy >= 100)&(not entity.is_Male)&(entity.can_mate)):
         return
-    entity.energy -= 140
+    entity.energy -= 100
+    entity.food -= 100
     entity.children += 1
     
     '''builds child'''

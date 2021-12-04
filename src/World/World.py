@@ -6,8 +6,8 @@ from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 import json
 
-starting_population = 50
-lower_bound_threshold = int(starting_population/1.5)
+starting_population = 200
+lower_bound_threshold = int(starting_population/2)
 
 step_years = 300
 generation_cycles = 10000
@@ -35,7 +35,6 @@ if __name__ == '__main__':
             [entity.next(environment) for entity in entities] # entities do actions
             '''Draw environment to screen'''
             draw.draw_environment(environment=environment,generation=generation, year=year, actions=actions) 
-            
             '''Check to see if failsafe needs to be triggered, lower population bound hit.'''
             if len(environment['environment_json']) <= lower_bound_threshold:
                 break
@@ -44,7 +43,7 @@ if __name__ == '__main__':
             entities = Entity.update_entity_values(environment=environment, world_size=world_size) # update environment entities
         
         '''Optional filter'''
-        #entities = Filter(entities=entities).filter_population()
+        entities = Filter(entities=entities).filter_population()
         
         '''Generation statistics'''
         Generation(entities=entities, population_limit=starting_population).statistics()
