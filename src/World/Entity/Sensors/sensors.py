@@ -11,7 +11,7 @@ class Sensors:
         return 1 / (1 + math.exp(-x))
         
     def velocity(self):
-        return self.Entity.velocity/10 
+        return self.Entity.velocity/31
     
     def current_velocity(self):
         return self.Entity.current_velocity/self.Entity.velocity
