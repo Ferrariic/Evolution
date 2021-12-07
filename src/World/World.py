@@ -6,12 +6,12 @@ from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 import json
 
-starting_population = 100
+starting_population = 1000
 lower_bound_threshold = int(starting_population/2)
 
-step_years = 300
+step_years = 10
 generation_cycles = 10000
-genome_length = 300
+genome_length = 3
 world_size=[[-256, 256],[-256, 256]]
 
 actions=True # See entity actions

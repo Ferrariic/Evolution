@@ -11,89 +11,65 @@ class Model:
         self.inner_neurons = inner_neurons
         self.output_neurons = output_neurons
     
-    def __activation(self, x, choice=1):
-        'relu'
-        if choice == 1:
-            return np.maximum(x, 0)
-        'sigmoid'
-        if choice == 2:
-            return 1 / (1 + math.exp(-x))
-    
     def compile_and_run(self):
-        # Solve hidden layers first
-        hidden_neuron_computation = dict()
-        for connection in self.brain:
-            if connection[2] == 'inner':
-                from_type = connection[0]
-                from_id = connection[1]
-                inner_id = connection[3]
-                weight = connection[4]
 
-                if from_type == 'inner':
-                    try:
-                        hidden_neuron_computation[str(inner_id)] = (self.inner_neurons[str(from_id)]*weight)+hidden_neuron_computation[str(inner_id)]
-                    except:
-                        try:
-                            hidden_neuron_computation[str(inner_id)] = dict()
-                            hidden_neuron_computation[str(inner_id)] = (self.inner_neurons[str(from_id)]*weight)
-                        except:
-                            pass
-
-                if from_type == 'input':
-                    try:
-                        hidden_neuron_computation[str(inner_id)] = (self.input_neurons[str(from_id)]*weight)+hidden_neuron_computation[str(inner_id)]
-                    except:
-                        try:
-                            hidden_neuron_computation[str(inner_id)] = dict()
-                            hidden_neuron_computation[str(inner_id)] = (self.input_neurons[str(from_id)]*weight)
-                        except:
-                            pass
-
-        hidden_neuron_values = dict()
-        for key, value in hidden_neuron_computation.items():
-            try:
-                hidden_neuron_values[key] = self.__activation(value)
-            except:
-                pass
-        
-        # Solve output layers
-        output_neuron_computation = dict()
-        for connection in self.brain:
-            if connection[2] == 'output':
-
-                from_type = connection[0]
-                from_id = connection[1]
-                outer_id = connection[3]
-                weight = connection[4]
-                
-                if from_type == 'inner':
-                    try:
-                        output_neuron_computation[str(outer_id)] = (hidden_neuron_values[str(from_id)]*weight)+output_neuron_computation[str(outer_id)]
-                    except:
-                        try:
-                            output_neuron_computation[str(outer_id)] = dict()
-                            output_neuron_computation[str(outer_id)] = (hidden_neuron_values[str(from_id)]*weight)
-                        except:
-                            pass
-                            
-                if from_type == 'input':
-                    try:
-                        output_neuron_computation[str(outer_id)] = (self.input_neurons[str(from_id)]*weight)+output_neuron_computation[str(outer_id)]
-                    except:
-                        try:
-                            output_neuron_computation[str(outer_id)] = dict()
-                            output_neuron_computation[str(outer_id)] = (self.input_neurons[str(from_id)]*weight)
-                        except:
-                            pass
-                        
-        output_values = dict()
-        for key, value in output_neuron_computation.items():
-            try:
-                output_values[key] = self.__activation(value)
-            except:
-                pass
         try:
-            best_choice = max(output_values, key=output_values.get)
+            """
+                Solve input layer
+            """
+
+            '''numpy conversion'''
+            self.brain = np.asarray(self.brain)
+            inputs = np.asarray([v for k,v in self.input_neurons.items()])
+            hiddens = np.asarray([v for k,v in self.inner_neurons.items()])
+            outputs = np.empty(len(self.output_neurons))
+
+            '''input solve'''
+            input_mask = self.brain[:,0] == 'input'
+            output_mask = self.brain[input_mask][:,2] == 'output'
+            hidden_mask = self.brain[input_mask][:,2] == 'inner'
+            input_calculations = np.take(inputs, self.brain[input_mask][:,1].astype('uint8'))*self.brain[input_mask][:,4].astype(np.float) # calculate input layer to cast into inner and output
+
+            '''assign inner and output values from input solve'''
+            output_idx = self.brain[input_mask][output_mask][:,3].astype('uint8')
+            outputs = np.bincount(output_idx, weights=input_calculations[output_mask])
+
+            hidden_idx = self.brain[input_mask][hidden_mask][:,3].astype('uint8')
+            hiddens = np.bincount(hidden_idx, weights=input_calculations[hidden_mask])
+
+            """
+                Solve Hidden Layer
+            """
+
+            '''builds masks'''
+            hidden_solve_mask = self.brain[:,0] == 'inner'
+            hidden_merge_mask = self.brain[hidden_solve_mask][:,2] == 'inner'
+            output_final_mask = self.brain[hidden_solve_mask][:,2] == 'output'
+
+            hiddens = np.tanh(hiddens) # Normalizes values
+            '''solves hidden calculations'''
+            hidden_calculations = np.take(hiddens, self.brain[hidden_solve_mask][:,1].astype('uint8'))*self.brain[hidden_solve_mask][:,4].astype(np.float)
+
+            '''hidden layer merges values'''
+            hidden_merge_idx = self.brain[hidden_solve_mask][hidden_merge_mask][:,3].astype('uint8')
+            hidden_temp = np.bincount(hidden_merge_idx, weights=hidden_calculations[hidden_merge_mask])
+            if hidden_temp.shape == hiddens.shape:
+                hiddens += hidden_temp
+            hiddens = np.tanh(hiddens)
+
+            """
+                Solves output layer
+            """
+            '''output layer merges values'''
+            output_temp_idx = self.brain[hidden_solve_mask][output_final_mask][:,3].astype('uint8')
+            output_temp = np.bincount(output_temp_idx, weights=hidden_calculations[output_final_mask])
+
+            '''finalizes'''
+            if outputs.shape == output_temp.shape:
+                outputs += output_temp
+            outputs = np.tanh(outputs)
+
+            choice = {'brain_status':str(np.argmax(outputs))}
+            return choice
         except:
-            return {'brain_status':'ERROR'}
-        return {'brain_status':best_choice}
+            return {'brain_status':'No Thoughts Could Be Created'} # This error occurs when, for some reason, there is an inability to form a thought.

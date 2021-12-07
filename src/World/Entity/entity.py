@@ -307,7 +307,8 @@ class Entity:
                            input_neurons=self.input_neurons,
                            inner_neurons=self.inner_neurons,
                            output_neurons=self.output_neurons).compile_and_run()
-            if choice['brain_status'] == 'ERROR':
+            
+            if choice['brain_status'] == 'No Thoughts Could Be Created':
                 return
             
             self.Actions.do_action(option=self.output_neurons[choice['brain_status']])
