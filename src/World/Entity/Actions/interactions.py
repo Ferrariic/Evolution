@@ -5,7 +5,7 @@ from Entity.genetics import *
 """
     Interaction backup functions
 """
-def closest_node(environment, entity, distance_threshold=8):
+def closest_node(environment, entity, distance_threshold=16):
     nodes = environment['all_entity_locations'][:]
     node = entity.position
     
@@ -122,6 +122,7 @@ def interact_HUNT(environment, entity):
     
     environment['hunt'] = environment['hunt'] + [entity.position, interaction_target['position']]
     entity.energy -= 5
+    entity.liked -= (interaction_target['liked']+100) # Reduces 'liked' metric by how much the target was liked + 100
     entity.position = interaction_target['position'] # sets position of entity on top of target
     interaction_target['health'] = 0 # kills target
     interaction_target['is_Alive'] = False # kills target

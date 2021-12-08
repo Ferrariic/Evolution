@@ -243,11 +243,24 @@ class Entity:
             '18' : y_density, # density in y direction
             '19' : x_distance_mate, # x distance to mate
             '20' : y_distance_mate, # y distance to mate
+            '21' : sensor.direction_to_mate(), # direction to mate
+            '22' : sensor.proximity_liked_intensity(), # How liked is the closest neighbor
+            '23' : sensor.proximity_liked_difference(), # Difference in 'liked' between neighbor and self
+            '24' : sensor.proximity_energy_intensity(), # How much energy the neighbor has
+            '25' : sensor.proximity_energy_difference(), # Difference in energy between self and neighbor
+            '26' : sensor.proximity_food_intensity(), # How much food neighbor has
+            '27' : sensor.proximity_food_difference(), # Difference in food from self to neighbor
+            '28' : sensor.proximity_health_intensity(), # How much health neighbor has
+            '29' : sensor.proximity_health_difference(), # Difference in health from self to neighbor
+            '30' : sensor.proximity_strength_intensity(), # Strength of neighbor
+            '31' : sensor.proximity_strength_difference(), # Difference in strength between self and neighbor
+            '32' : sensor.proximity_current_velocity_intensity(), # current velocity of neighbor
+            '33' : sensor.proximity_current_speed_difference(), # Difference in current speed between self and neighbor 
             }
 
             '''inner neurons'''
             # Establish inner neurons and their goals
-            INNER_NEURONS = 10
+            INNER_NEURONS = 5
             self.inner_neurons = {str(key):0 for key in range(INNER_NEURONS)}
             
             '''output neurons'''
