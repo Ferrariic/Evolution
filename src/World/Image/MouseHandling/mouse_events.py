@@ -91,7 +91,6 @@ class MouseEvents:
         except:
             pass
         
-        
     def process_events(self):
         self.__mark_mouse_position()
         self.__draw_box_around_closest_entity()

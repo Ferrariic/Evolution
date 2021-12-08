@@ -99,7 +99,7 @@ class Status:
     def __world_decay(self):
         '''constant decay states for the world'''
         genome_length = len(self.genome.split(' '))
-        self.food -= (1+(0.01*genome_length)+(0.025*self.size)+(0.01*self.current_velocity)) # Subtract 1 food per cycle, times a genome length modifier
+        self.food -= (1+(0.01*genome_length)+(0.025*self.size)+(0.02*self.current_velocity)) # Subtract 1 food per cycle, times a genome length modifier
         self.age += 1 # Add one age per cycle
         
     def __spend_stats(self):

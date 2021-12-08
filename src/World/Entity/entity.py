@@ -260,7 +260,7 @@ class Entity:
 
             '''inner neurons'''
             # Establish inner neurons and their goals
-            INNER_NEURONS = 5
+            INNER_NEURONS = 10
             self.inner_neurons = {str(key):0 for key in range(INNER_NEURONS)}
             
             '''output neurons'''

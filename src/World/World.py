@@ -5,14 +5,13 @@ from Environment.rebuild_generation import Generation
 from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 import json
-import cProfile
 
 starting_population = 100
 lower_bound_threshold = int(starting_population/3)
 
-step_years = 1000
+step_years = 300
 generation_cycles = 10000
-genome_length = 4
+genome_length = 100
 world_size=[[-256, 256],[-256, 256]]
 
 actions=True # See entity actions
