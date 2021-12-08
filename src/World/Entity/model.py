@@ -12,8 +12,11 @@ class Model:
         self.output_neurons = output_neurons
     
     def compile_and_run(self):
-
         try:
+            if len(self.brain) == 0:
+                '''brain could not be created.'''
+                return {'brain_status':'No Thoughts Could Be Created'} 
+            
             """
                 Solve input layer
             """
@@ -32,10 +35,10 @@ class Model:
 
             '''assign inner and output values from input solve'''
             output_idx = self.brain[input_mask][output_mask][:,3].astype('uint8')
-            outputs = np.bincount(output_idx, weights=input_calculations[output_mask])
+            outputs = np.bincount(output_idx, weights=input_calculations[output_mask].astype(np.float))
 
             hidden_idx = self.brain[input_mask][hidden_mask][:,3].astype('uint8')
-            hiddens = np.bincount(hidden_idx, weights=input_calculations[hidden_mask])
+            hiddens = np.bincount(hidden_idx, weights=input_calculations[hidden_mask].astype(np.float))
 
             """
                 Solve Hidden Layer
@@ -48,6 +51,19 @@ class Model:
 
             hiddens = np.tanh(hiddens) # Normalizes values
             '''solves hidden calculations'''
+            
+            if len(hiddens) == 0:
+                if len(outputs)==0:
+                    return {'brain_status':'No Thoughts Could Be Created'} 
+                '''If there are no hidden values to solve for, just output outputs with tanh conversion'''
+                choice = {'brain_status':str(np.argmax(np.tanh(outputs)))}
+                return choice
+            
+            try:
+                shift = np.max(self.brain[hidden_solve_mask][:,1].astype(np.uint8))-hiddens.shape[0]+1
+                hiddens = np.pad(hiddens, (0, shift), 'constant')
+            except ValueError:
+                pass
             hidden_calculations = np.take(hiddens, self.brain[hidden_solve_mask][:,1].astype('uint8'))*self.brain[hidden_solve_mask][:,4].astype(np.float)
 
             '''hidden layer merges values'''
@@ -67,9 +83,14 @@ class Model:
             '''finalizes'''
             if outputs.shape == output_temp.shape:
                 outputs += output_temp
+        
+            if len(outputs)==0:
+                # This error occurs when, for some reason, there is an inability to form a thought.
+                return {'brain_status':'No Thoughts Could Be Created'}
+            
             outputs = np.tanh(outputs)
-
             choice = {'brain_status':str(np.argmax(outputs))}
             return choice
-        except:
-            return {'brain_status':'No Thoughts Could Be Created'} # This error occurs when, for some reason, there is an inability to form a thought.
+        except Exception as e:
+            #print(e)
+            return {'brain_status':'No Thoughts Could Be Created'}
