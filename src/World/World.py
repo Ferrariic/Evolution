@@ -5,13 +5,14 @@ from Environment.rebuild_generation import Generation
 from Image.draw_screen import DrawImage
 from Environment.filter import Filter
 import json
+import cProfile
 
-starting_population = 200
-lower_bound_threshold = int(starting_population/2)
+starting_population = 100
+lower_bound_threshold = int(starting_population/3)
 
-step_years = 300
+step_years = 1000
 generation_cycles = 10000
-genome_length = 2
+genome_length = 4
 world_size=[[-256, 256],[-256, 256]]
 
 actions=True # See entity actions
@@ -38,13 +39,11 @@ if __name__ == '__main__':
             '''Check to see if failsafe needs to be triggered, lower population bound hit.'''
             if len(environment['environment_json']) <= lower_bound_threshold:
                 break
-            
             '''Update entities based upon the environment'''
             entities = Entity.update_entity_values(environment=environment, world_size=world_size) # update environment entities
         
         '''Optional filter'''
-        entities = Filter(entities=entities).filter_population()
-        
+        #entities = Filter(entities=entities).filter_population()
         '''Generation statistics'''
         Generation(entities=entities, population_limit=starting_population).statistics()
         '''Rebuilding the population after each generation based upon the survivors.'''
