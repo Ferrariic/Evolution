@@ -11,7 +11,7 @@ lower_bound_threshold = int(starting_population/3)
 
 step_years = 300
 generation_cycles = 10000
-genome_length = 100
+genome_length = 2
 world_size=[[-256, 256],[-256, 256]]
 
 actions=True # See entity actions
