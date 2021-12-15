@@ -1,6 +1,7 @@
 import random
 from Entity.genetics import *
 from Entity.entity import Entity
+import numpy as np
 import json
 
 class Generation:
@@ -29,8 +30,20 @@ class Generation:
         return entity_list
         
     def statistics(self):
-        gene_lists= [entity.genome.split(' ') for entity in self.entities]
-        genes = [gene for entity_genes in gene_lists for gene in entity_genes]
-        Unique_genes = len(set(genes))
-        print(f'{Unique_genes=}')
+        def get_unique_genes():
+            gene_lists= [entity.genome.split(' ') for entity in self.entities]
+            genes = [gene for entity_genes in gene_lists for gene in entity_genes]
+            Unique_genes = len(set(genes))
+            return Unique_genes
+        def get_average_age():
+            return round(np.mean(np.asarray([entity.age for entity in self.entities])), 2)
+        def get_average_strength():
+            return round(np.mean(np.asarray([entity.strength for entity in self.entities])), 2)
+        def get_average_children():
+            return round(np.mean(np.asarray([entity.children for entity in self.entities])), 2)
+        def get_average_food():
+            return round(np.mean(np.asarray([entity.food for entity in self.entities])), 2)
+        def get_average_current_velocity():
+            return round(np.mean(np.asarray([entity.current_velocity for entity in self.entities])), 2)
         
+        print(f'Genes: {get_unique_genes()}\nAge: {get_average_age()}\nStrength: {get_average_strength()}\nChildren {get_average_children()}\nFood: {get_average_food()}\nCurrent Velocity: {get_average_current_velocity()}')
