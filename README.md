@@ -1,3 +1,3 @@
-# Cataclysm-Evolution
+# Evolution
 
-Files for the game Cataclysm Evolution
+Genetic algorithims for a self-contained ecosystem.
