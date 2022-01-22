@@ -2,3 +2,4 @@ launch.json
 .vscode/
 __pycache__/
 data.json
+/venv/
