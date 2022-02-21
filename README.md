@@ -26,11 +26,14 @@ pip install -r requirements.txt
 
 ### What are the different screen-related elements?
 **Sprites**
+
 ![Sprite](https://user-images.githubusercontent.com/5789682/154923420-d236f3f9-7ddb-4156-9a25-ae075fb4a905.png)
- These are sprites. They represent single entities in the environment. The actions that the entities are performing can be seen above the sprite. In this case, this entity is moving upward relative to the surrounding screen.
+
+These are sprites. They represent single entities in the environment. The actions that the entities are performing can be seen above the sprite. In this case, this entity is moving upward relative to the surrounding screen.
  
  **Environment**
- The environment is a collection of sprites and their actions. Every `year` or `turn` the sprites can perform exactly one action. During this action period, they may fight, mate, move, rotate, or make another decision, this is reflected in the console, and on the corresponding display.
+ 
+The environment is a collection of sprites and their actions. Every `year` or `turn` the sprites can perform exactly one action. During this action period, they may fight, mate, move, rotate, or make another decision, this is reflected in the console, and on the corresponding display.
 
 ![image](https://user-images.githubusercontent.com/5789682/154921737-cafe672f-1c71-42b2-b6ee-f7c3ee9aa56d.png)
 
